@@ -44,12 +44,18 @@ a { text-decoration: none; transition: all 0.2s ease; }
     max-width: 1300px;
     margin: 0 auto;
     display: flex;
-    justify-content: center; /* Centers the logo perfectly */
+    justify-content: center; /* Centers the logo and text perfectly */
     align-items: center;
+    gap: 20px; /* Space between the image and text */
+}
+
+.header-logo {
+    height: 50px; /* Adjust this to make your logo bigger or smaller */
+    width: auto;
 }
 
 .logo {
-    font-size: 3.5rem; /* Made slightly larger for impact */
+    font-size: 3.5rem;
     font-weight: 900;
     letter-spacing: -2px;
     background: linear-gradient(135deg, var(--text-dark), #334155);
@@ -191,7 +197,6 @@ a { text-decoration: none; transition: all 0.2s ease; }
     line-height: 1.4;
 }
 .trending-list a:hover { color: var(--color-accent); }
-
 
 /* --- Trending Banner --- */
 .trending-banner {
