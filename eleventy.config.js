@@ -1,9 +1,10 @@
 module.exports = function(eleventyConfig) {
   
-  // ADD THIS EXACT LINE to tell Cloudflare to use your CSS
+  // Tell Eleventy to copy these files to your final live site
   eleventyConfig.addPassthroughCopy("style.css");
+  eleventyConfig.addPassthroughCopy("logo-icon.png");
 
-  // This line defines the missing "limit" function for your grids
+  // This defines the "limit" function for your article grids
   eleventyConfig.addFilter("limit", function(array, limit) {
     return array.slice(0, limit);
   });
