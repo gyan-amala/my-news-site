@@ -3,99 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Chronicle</title>
+    <title>Gyan Amala | Modern Knowledge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- We are using Lora for elegant storytelling, and Inter for crisp UI text -->
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-    <header class="zen-header">
-         <div class="site-date">Sunday, July 5, 2026</div> 
-        <h1 class="logo"><a href="/"> Gyan Amala </a></h1>
-        <nav class="zen-nav">
-            <a href="/">Latest</a>
-            <a href="#polity">Polity</a>
+    <!-- Modern Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <h1 class="logo">GYAN AMALA</h1>
+            <a href="#subscribe" class="btn-subscribe">Subscribe Free</a>
+        </div>
+        <nav class="main-nav">
+            <a href="/" class="active">Home</a>
+            <a href="#polity">Polity & Governance</a>
             <a href="#economy">Economy</a>
-            <a href="#science">Science</a>
+            <a href="#geography">Geography & Env</a>
+            <a href="#history">History</a>
+            <a href="#science">Science & Tech</a>
         </nav>
     </header>
 
-    <main class="zen-main">
-        
-        <!-- THE CHRONICLE STREAM (Latest 5 Articles) -->
-        <section class="stream-section">
-            {% for article in collections.all | reverse | limit(5) %}
-                
-                <!-- The absolute newest article becomes the Spotlight Hero -->
-                {% if loop.first %}
-                    <article class="spotlight-hero">
-                        <div class="meta-tag">{{ article.data.category }}</div>
-                        <h2 class="spotlight-title">
-                            <a href="{{ article.url }}">{{ article.data.title }}</a>
-                        </h2>
-                        <p class="spotlight-excerpt">{{ article.data.excerpt }}</p>
-                        <div class="spotlight-meta">By Editorial Desk &nbsp;·&nbsp; 5 min read</div>
+    <div class="wrapper">
+        <!-- 70/30 SPLIT LAYOUT -->
+        <div class="split-layout">
+            
+            <!-- LEFT: 70% MAIN FEED -->
+            <main class="main-content">
+                <div class="section-heading">
+                    <div class="heading-dot"></div>
+                    <h2>The Latest Wire</h2>
+                </div>
+
+                <div class="dynamic-feed">
+                    <!-- The Eleventy Loop for the 3 most recent articles -->
+                    {% for article in collections.all | reverse | limit(3) %}
+                    <article class="news-card">
+                        <div class="card-tag tag-{{ article.data.category }}">{{ article.data.category }}</div>
+                        <h3 class="card-title"><a href="{{ article.url }}">{{ article.data.title }}</a></h3>
+                        <p class="card-excerpt">{{ article.data.excerpt }}</p>
+                        <div class="card-meta">
+                            <span class="author">By Desk Editor</span> • <span class="read-time">5 Min Read</span>
+                        </div>
                     </article>
-                
-                <!-- The remaining 4 articles become the clean text stream -->
-                {% else %}
-                    <article class="stream-item">
-                        <h3 class="stream-title">
-                            <a href="{{ article.url }}">{{ article.data.title }}</a>
-                        </h3>
-                        <div class="stream-tag">{{ article.data.category }}</div>
-                    </article>
-                {% endif %}
-                
-            {% endfor %}
+                    {% endfor %}
+                </div>
+            </main>
+
+            <!-- RIGHT: 30% SIDEBAR -->
+            <aside class="sidebar">
+                <!-- Trending List (Static layout for visual structure) -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">🔥 Most Read</h3>
+                    <ul class="trending-list">
+                        <li>
+                            <span class="rank">1</span>
+                            <a href="#">The Cosmic Metronome: How Atomic Clocks Turn Time into Distance</a>
+                        </li>
+                        <li>
+                            <span class="rank">2</span>
+                            <a href="#">Why Is India Investing ₹80,000 Crore in a New Rajasthan Refinery?</a>
+                        </li>
+                        <li>
+                            <span class="rank">3</span>
+                            <a href="#">Global Trade Accord Signed by 15 Nations</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Vibrant Newsletter Module -->
+                <div class="newsletter-widget">
+                    <h3>The Daily Brief</h3>
+                    <p>Get our sharp editorial analysis delivered to your inbox every morning.</p>
+                    <input type="email" placeholder="Your email address..." class="news-input">
+                    <button class="news-btn">Sign Up</button>
+                </div>
+            </aside>
+        </div>
+
+        <!-- FULL WIDTH BREAK: TRENDING HIGHLIGHTS -->
+        <section class="trending-banner">
+            <div class="banner-badge">★ TOP STORIES</div>
+            <div class="banner-grid">
+                {% for article in collections.all %}
+                    {% if article.data.trending == true %}
+                    <div class="banner-card">
+                        <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        <p>{{ article.data.excerpt }}</p>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
         </section>
 
-        <!-- Thick editorial separator -->
-        <hr class="section-divider">
-
-        <!-- THE MINIMALIST TOPIC STRIP -->
-        <section class="topic-strip">
+        <!-- 3-COLUMN CATEGORY GRID -->
+        <section class="category-grid">
             
-            <div class="topic-column">
-                <h4 class="topic-heading">Polity</h4>
-                <ul class="topic-list">
+            <div class="cat-column border-polity">
+                <h3 class="cat-header bg-polity">Polity & Governance</h3>
+                <div class="cat-list">
                     {% for article in collections.all | reverse %}
                         {% if article.data.category == "polity" %}
-                            <li><a href="{{ article.url }}">{{ article.data.title }}</a></li>
+                        <div class="mini-card">
+                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        </div>
                         {% endif %}
                     {% endfor %}
-                </ul>
+                </div>
             </div>
-            
-            <div class="topic-column">
-                <h4 class="topic-heading">Economy</h4>
-                <ul class="topic-list">
+
+            <div class="cat-column border-economy">
+                <h3 class="cat-header bg-economy">Economy & Markets</h3>
+                <div class="cat-list">
                     {% for article in collections.all | reverse %}
                         {% if article.data.category == "economy" %}
-                            <li><a href="{{ article.url }}">{{ article.data.title }}</a></li>
+                        <div class="mini-card">
+                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        </div>
                         {% endif %}
                     {% endfor %}
-                </ul>
+                </div>
             </div>
-            
-            <div class="topic-column">
-                <h4 class="topic-heading">Science</h4>
-                <ul class="topic-list">
+
+            <div class="cat-column border-science">
+                <h3 class="cat-header bg-science">Science & Tech</h3>
+                <div class="cat-list">
                     {% for article in collections.all | reverse %}
                         {% if article.data.category == "science" %}
-                            <li><a href="{{ article.url }}">{{ article.data.title }}</a></li>
+                        <div class="mini-card">
+                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        </div>
                         {% endif %}
                     {% endfor %}
-                </ul>
+                </div>
             </div>
 
         </section>
-    </main>
+    </div>
 
-    <footer class="zen-footer">
+    <footer>
         <p>© 2026 Gyan Amala. Independent Journalism.</p>
     </footer>
 
