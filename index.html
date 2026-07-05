@@ -2,50 +2,160 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Custom News Magazine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Chronicle | Modern News</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <header><h1>The Daily Chronicle</h1></header>
-    <main>
-        <!-- SECTION 1: RECENT ARTICLES -->
-        <section>
-            <h2>Recent Articles</h2>
-            {% for article in collections.all | reverse | limit(4) %}
-            <div><h3><a href="{{ article.url }}">{{ article.data.title }}</a></h3></div>
-            {% endfor %}
-        </section>
 
-        <!-- SECTION 2: TOP ARTICLES -->
-        <section>
-            <h2>Top Stories</h2>
-            {% for article in collections.all %}
-                {% if article.data.trending == true %}
-                <div><h3><a href="{{ article.url }}">{{ article.data.title }}</a></h3></div>
-                {% endif %}
-            {% endfor %}
-        </section>
+    <!-- Colorful Glassmorphism Ticker -->
+    <div class="top-ticker">
+        <div class="ticker-content">
+            <span class="ticker-badge">⚡ LIVE</span>
+            <marquee scrollamount="5" class="ticker-text">
+                MARKET WATCH: NIFTY 50 ▲ 1.2% &nbsp;&nbsp;|&nbsp;&nbsp; S&P 500 ▲ 0.5% &nbsp;&nbsp;|&nbsp;&nbsp; GOLD ▼ 0.8% &nbsp;&nbsp;|&nbsp;&nbsp; TECH SECTOR RALLIES AFTER NEW POLICY ANNOUNCEMENT
+            </marquee>
+        </div>
+    </div>
 
-        <!-- SECTION 3: TOPIC GRID -->
-        <section>
-            <h2>Categories</h2>
-            <div>
-                <h3>Polity</h3>
+    <!-- Modern Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="date-pill">Sunday, July 5, 2026</div>
+            <h1 class="logo">THE CHRONICLE</h1>
+            <a href="#subscribe" class="btn-subscribe">Subscribe Free</a>
+        </div>
+        <nav class="main-nav">
+            <a href="/" class="active">Home</a>
+            <a href="#polity">Polity</a>
+            <a href="#economy">Economy</a>
+            <a href="#science">Science & Tech</a>
+        </nav>
+    </header>
+
+    <div class="wrapper">
+        <!-- 70/30 SPLIT LAYOUT -->
+        <div class="split-layout">
+            
+            <!-- LEFT: 70% MAIN FEED -->
+            <main class="main-content">
+                <div class="section-heading">
+                    <div class="heading-dot"></div>
+                    <h2>The Latest Wire</h2>
+                </div>
+
+                <div class="dynamic-feed">
+                    <!-- The Eleventy Loop for the 3 most recent articles -->
+                    {% for article in collections.all | reverse | limit(3) %}
+                    <article class="news-card">
+                        <div class="card-tag tag-{{ article.data.category }}">{{ article.data.category }}</div>
+                        <h3 class="card-title"><a href="{{ article.url }}">{{ article.data.title }}</a></h3>
+                        <p class="card-excerpt">{{ article.data.excerpt }}</p>
+                        <div class="card-meta">
+                            <span class="author">By Desk Editor</span> • <span class="read-time">5 Min Read</span>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </main>
+
+            <!-- RIGHT: 30% SIDEBAR -->
+            <aside class="sidebar">
+                <!-- Trending List (Static layout for visual structure) -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">🔥 Most Read</h3>
+                    <ul class="trending-list">
+                        <li>
+                            <span class="rank">1</span>
+                            <a href="#">The Cosmic Metronome: How Atomic Clocks Turn Time into Distance</a>
+                        </li>
+                        <li>
+                            <span class="rank">2</span>
+                            <a href="#">Why Is India Investing ₹80,000 Crore in a New Rajasthan Refinery?</a>
+                        </li>
+                        <li>
+                            <span class="rank">3</span>
+                            <a href="#">Global Trade Accord Signed by 15 Nations</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Vibrant Newsletter Module -->
+                <div class="newsletter-widget">
+                    <h3>The Daily Brief</h3>
+                    <p>Get our sharp editorial analysis delivered to your inbox every morning.</p>
+                    <input type="email" placeholder="Your email address..." class="news-input">
+                    <button class="news-btn">Sign Up</button>
+                </div>
+            </aside>
+        </div>
+
+        <!-- FULL WIDTH BREAK: TRENDING HIGHLIGHTS -->
+        <section class="trending-banner">
+            <div class="banner-badge">★ TOP STORIES</div>
+            <div class="banner-grid">
                 {% for article in collections.all %}
-                    {% if article.data.category == "polity" %}
-                    <li><a href="{{ article.url }}">{{ article.data.title }}</a></li>
+                    {% if article.data.trending == true %}
+                    <div class="banner-card">
+                        <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        <p>{{ article.data.excerpt }}</p>
+                    </div>
                     {% endif %}
                 {% endfor %}
             </div>
-            <div>
-                <h3>Economy</h3>
-                {% for article in collections.all %}
-                    {% if article.data.category == "economy" %}
-                    <li><a href="{{ article.url }}">{{ article.data.title }}</a></li>
-                    {% endif %}
-                {% endfor %}
-            </div>
         </section>
-    </main>
+
+        <!-- 3-COLUMN CATEGORY GRID -->
+        <section class="category-grid">
+            
+            <div class="cat-column border-polity">
+                <h3 class="cat-header bg-polity">Polity & Governance</h3>
+                <div class="cat-list">
+                    {% for article in collections.all | reverse %}
+                        {% if article.data.category == "polity" %}
+                        <div class="mini-card">
+                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="cat-column border-economy">
+                <h3 class="cat-header bg-economy">Economy & Markets</h3>
+                <div class="cat-list">
+                    {% for article in collections.all | reverse %}
+                        {% if article.data.category == "economy" %}
+                        <div class="mini-card">
+                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="cat-column border-science">
+                <h3 class="cat-header bg-science">Science & Tech</h3>
+                <div class="cat-list">
+                    {% for article in collections.all | reverse %}
+                        {% if article.data.category == "science" %}
+                        <div class="mini-card">
+                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <footer>
+        <p>© 2026 The Chronicle Media Group. Built for the modern web.</p>
+    </footer>
+
 </body>
 </html>
-
