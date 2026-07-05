@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Custom News Magazine</title>
+</head>
+<body>
+    <header><h1>The Daily Chronicle</h1></header>
+    <main>
+        <!-- SECTION 1: RECENT ARTICLES -->
+        <section>
+            <h2>Recent Articles</h2>
+            {% for article in collections.all | reverse | limit(4) %}
+            <div><h3><a href="{{ article.url }}">{{ article.data.title }}</a></h3></div>
+            {% endfor %}
+        </section>
+
+        <!-- SECTION 2: TOP ARTICLES -->
+        <section>
+            <h2>Top Stories</h2>
+            {% for article in collections.all %}
+                {% if article.data.trending == true %}
+                <div><h3><a href="{{ article.url }}">{{ article.data.title }}</a></h3></div>
+                {% endif %}
+            {% endfor %}
+        </section>
+
+        <!-- SECTION 3: TOPIC GRID -->
+        <section>
+            <h2>Categories</h2>
+            <div>
+                <h3>Polity</h3>
+                {% for article in collections.all %}
+                    {% if article.data.category == "polity" %}
+                    <li><a href="{{ article.url }}">{{ article.data.title }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div>
+                <h3>Economy</h3>
+                {% for article in collections.all %}
+                    {% if article.data.category == "economy" %}
+                    <li><a href="{{ article.url }}">{{ article.data.title }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
+
