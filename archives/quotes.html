@@ -1,0 +1,18 @@
+---
+permalink: /archives/quotes/
+layout: index.html
+---
+<div class="wrapper" style="margin-top: 40px;">
+    <div class="section-heading">
+        <div class="heading-dot" style="background: var(--color-polity);"></div>
+        <h2>The Vault of Wisdom (All Quotes)</h2>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 50px;">
+        {% for brief in collections.daily | reverse %}
+        <div style="background: var(--card-bg); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow-soft);">
+            <p style="font-size: 1.2rem; font-weight: 500; margin-bottom: 10px;">"{{ brief.data.quoteText }}"</p>
+            <p style="color: var(--text-muted); font-weight: 700;">— {{ brief.data.quoteAuthor }} <span style="font-weight:400; font-size:0.85rem; margin-left: 10px;">({{ brief.data.date }})</span></p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
