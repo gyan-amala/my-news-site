@@ -1,0 +1,19 @@
+---
+permalink: /archives/facts/
+layout: index.html
+---
+<div class="wrapper" style="margin-top: 40px;">
+    <div class="section-heading">
+        <div class="heading-dot" style="background: var(--color-science);"></div>
+        <h2>The Curiosity Shop (Fact Archive)</h2>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 50px;">
+        {% for brief in collections.daily | reverse %}
+        <div style="background: var(--card-bg); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow-soft);">
+            <span style="font-size: 0.75rem; font-weight: 800; color: var(--color-science); display: block; margin-bottom: 10px;">FACT LOG #{{ brief.data.date }}</span>
+            <p style="font-size: 1.1rem; line-height: 1.5;">{{ brief.data.randomFact }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
