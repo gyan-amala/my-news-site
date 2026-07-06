@@ -24,7 +24,37 @@
     </header>
 
     <div class="wrapper">
-        <!-- 70/30 SPLIT LAYOUT -->
+        
+        <!-- 1. TOP SECTION: THE DAILY BRIEFING WIRE -->
+        <!-- This automatically Grabs the latest entry from your daily log folder -->
+        {% set latestBrief = collections.daily | reverse | first %}
+        {% if latestBrief %}
+        <section class="daily-brief-grid">
+            
+            <!-- Quote Basket Item -->
+            <div class="brief-card status-quote">
+                <span class="brief-badge">💬 QUOTE OF THE DAY</span>
+                <p class="quote-text">"{{ latestBrief.data.quoteText }}"</p>
+                <span class="quote-author">— {{ latestBrief.data.quoteAuthor }}</span>
+            </div>
+            
+            <!-- History Basket Item -->
+            <div class="brief-card status-history">
+                <span class="brief-badge">⏳ ON THIS DAY</span>
+                <h4 class="history-year">Year: {{ latestBrief.data.historyYear }}</h4>
+                <p class="history-text">{{ latestBrief.data.historyEvent }}</p>
+            </div>
+            
+            <!-- Fact Basket Item -->
+            <div class="brief-card status-fact">
+                <span class="brief-badge">💡 DID YOU KNOW?</span>
+                <p class="fact-text">{{ latestBrief.data.randomFact }}</p>
+            </div>
+            
+        </section>
+        {% endif %}
+
+        <!-- 2. MIDDLE SECTION: 70/30 SPLIT LAYOUT -->
         <div class="split-layout">
             
             <!-- LEFT: 70% MAIN FEED -->
@@ -61,7 +91,7 @@
                         </li>
                         <li>
                             <span class="rank">2</span>
-                            <a href="https://bharatfrontier.com/" target="_blank">Why Is India Investing ₹80,000 Crore in a New Rajasthan Refinery?</a>
+                            <a href="https://musingsofaditya.blogspot.com/2025/08/kuch-rabta-urdu-se.html" target="_blank">kuch rabta urdu se</a>
                         </li>
                         <li>
                             <span class="rank">3</span>
@@ -72,7 +102,7 @@
             </aside>
         </div>
 
-        <!-- FULL WIDTH BREAK: TRENDING HIGHLIGHTS -->
+        <!-- 3. FULL WIDTH BREAK: TRENDING HIGHLIGHTS -->
         <section class="trending-banner">
             <div class="banner-badge">★ TOP STORIES</div>
             <div class="banner-grid">
@@ -87,7 +117,7 @@
             </div>
         </section>
 
-        <!-- 3-COLUMN CATEGORY GRID -->
+        <!-- 4. 3-COLUMN CATEGORY GRID -->
         <section class="category-grid">
             
             <div class="cat-column border-polity">
@@ -130,6 +160,43 @@
             </div>
 
         </section>
+
+        <!-- 5. BOTTOM SECTION: THE THREE ARCHIVE BASKETS -->
+        <section class="archive-baskets-section">
+            <div class="section-heading">
+                <div class="heading-dot basket-dot"></div>
+                <h2>Knowledge Baskets (Back Issues)</h2>
+            </div>
+            
+            <div class="baskets-grid">
+                
+                <!-- Basket 1: Quotes -->
+                <div class="basket-card border-quote">
+                    <div class="basket-icon">🏺</div>
+                    <h3 class="basket-title">The Vault of Wisdom</h3>
+                    <p class="basket-desc">Missed a day? Take a stroll through every perspective, philosophy, and quote we've ever logged.</p>
+                    <a href="/archives/quotes/" class="basket-btn">Open Quote Basket →</a>
+                </div>
+
+                <!-- Basket 2: History -->
+                <div class="basket-card border-history">
+                    <div class="basket-icon">📜</div>
+                    <h3 class="basket-title">Echoes of Time</h3>
+                    <p class="basket-desc">A deep-dive chronological timeline of historic global and regional events occurring on this day.</p>
+                    <a href="/archives/history/" class="basket-btn">Open History Basket →</a>
+                </div>
+
+                <!-- Basket 3: Facts -->
+                <div class="basket-card border-fact">
+                    <div class="basket-icon">🧬</div>
+                    <h3 class="basket-title">The Curiosity Shop</h3>
+                    <p class="basket-desc">Uncover random facts, science anomalies, and mini trivia bits preserved from our daily logs.</p>
+                    <a href="/archives/facts/" class="basket-btn">Open Fact Basket →</a>
+                </div>
+
+            </div>
+        </section>
+
     </div>
 
     <footer>
