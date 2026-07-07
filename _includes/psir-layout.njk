@@ -2,63 +2,61 @@
 layout: base.html
 ---
 
-<div class="psir-article-container" style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: system-ui, sans-serif;">
+<div class="psir-article-container">
   
   <!-- 🗺️ BREADCRUMB NAVIGATION -->
-  <nav class="psir-breadcrumb" style="margin-bottom: 20px; font-size: 0.9rem; color: #718096; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
-    <a href="/psir/" style="color: #3182ce; text-decoration: none; font-weight: 500;">← PSIR Hub</a>
-    <span style="color: #cbd5e0;">/</span>
+  <nav class="psir-breadcrumb" aria-label="Breadcrumbs">
+    <a href="/psir/" class="breadcrumb-link">← PSIR Hub</a>
+    <span class="breadcrumb-divider">/</span>
     <span>Paper {{ paper }}</span>
-    <span style="color: #cbd5e0;">/</span>
+    <span class="breadcrumb-divider">/</span>
     <span>Section {{ section }}</span>
     {% if topic %}
-      <span style="color: #cbd5e0;">/</span>
-      <span style="color: #4a5568; font-weight: 500;">{{ topic }}</span>
+      <span class="breadcrumb-divider">/</span>
+      <span class="breadcrumb-current">{{ topic }}</span>
     {% endif %}
   </nav>
 
   <!-- 📝 ARTICLE HEADER -->
-  <header class="psir-article-header" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px;">
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+  <header class="psir-article-header">
+    <div class="psir-badge-row">
       
       <!-- Dynamic Content Type Badge -->
       {% if contentType == "PYQ" %}
-        <span style="background-color: #feebc8; color: #c05621; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">
+        <span class="badge badge-pyq">
           ✍️ PYQ {{ year }}
         </span>
       {% elif contentType == "ModelAnswer" %}
-        <span style="background-color: #faf5ff; color: #6b46c1; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">
+        <span class="badge badge-model">
           💡 Model Answer
         </span>
       {% else %}
-        <span style="background-color: #e6fffa; color: #234e52; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">
+        <span class="badge badge-note">
           📝 Core Note
         </span>
       {% endif %}
 
       {% if subTopic %}
-        <span style="color: #718096; font-size: 0.9rem;">• Topic Focus: <strong>{{ subTopic }}</strong></span>
+        <span class="psir-topic-focus">• Topic Focus: <strong>{{ subTopic }}</strong></span>
       {% endif %}
     </div>
 
     <!-- Note Title -->
-    <h1 style="font-size: 2.2rem; color: #1a202c; line-height: 1.3; margin: 0 0 10px 0; font-weight: 700;">
+    <h1 class="psir-title">
       {{ title }}
     </h1>
   </header>
 
   <!-- 📖 NOTE BODY CONTENT -->
-  <!-- This is where Eleventy dynamically drops your raw markdown text from your tablet -->
-  <article class="psir-content" style="font-size: 1.1rem; line-height: 1.72; color: #2d3748;">
+  <article class="psir-content">
     {{ content | safe }}
   </article>
 
   <!-- 🔙 BOTTOM NAVIGATION BAR -->
-  <div class="psir-footer-nav" style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center;">
-    <a href="/psir/" style="display: inline-block; background-color: #f7fafc; border: 1px solid #cbd5e0; color: #4a5568; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; transition: background 0.2s;">
+  <div class="psir-footer-nav">
+    <a href="/psir/" class="return-btn">
       Return to PSIR Study Hub
     </a>
   </div>
 
 </div>
-
