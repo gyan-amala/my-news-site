@@ -1,10 +1,10 @@
 ---
 layout: psir-layout.njk
-title: "Plato's Theory of Justice and the Ideal State"
+title: "Political Theory – Genesis, Nature, and Contemporary Relevance"
 paper: "1"
 section: "A"
-topic: "Western Political Thought"
-subTopic: "Plato"
+topic: "Political Theory"
+subTopic: "Genesis, Nature, and Contemporary Relevance"
 contentType: "Note"
 ---
 # **PATH A: REVISION NOTES**
