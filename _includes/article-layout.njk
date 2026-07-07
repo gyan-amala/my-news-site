@@ -2,32 +2,31 @@
 layout: base.html
 ---
 
-<div class="article-container" style="max-width: 800px; margin: 50px auto; padding: 20px;">
+<div class="article-container">
     
     <!-- Navigation -->
-    <a href="/" style="display: inline-block; margin-bottom: 25px; color: var(--text-muted); text-decoration: none; font-weight: 700; font-size: 0.95rem;">
+    <a href="/" class="back-link">
         ← Back to Newsroom
     </a>
     
     <!-- Article Header -->
-    <header style="margin-bottom: 40px;">
+    <header class="article-header">
         <!-- Category Badge -->
-        <span class="card-tag tag-{{ category }}" style="margin-bottom: 15px;">{{ category }}</span>
+        <span class="card-tag tag-{{ category }}">{{ category }}</span>
         
-        <h1 style="font-size: 2.8rem; line-height: 1.25; margin-bottom: 15px; color: var(--text-dark); font-weight: 900;">
+        <h1 class="article-title">
             {{ title }}
         </h1>
         
         <!-- Meta Information -->
-        <div style="color: var(--text-muted); font-weight: 600; font-size: 0.95rem; border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 20px;">
+        <div class="article-meta">
             By {{ author | default("Desk Editor") }} • {{ category | capitalize }} Bureau
         </div>
     </header>
     
     <!-- 🌟 THE ARTICLE BODY 🌟 -->
-    <article style="font-size: 1.15rem; line-height: 1.8; color: #334155;">
+    <article class="article-content">
         {{ content | safe }}
     </article>
 
 </div>
-
