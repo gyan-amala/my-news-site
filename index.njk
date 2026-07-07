@@ -38,35 +38,38 @@ layout: base.html
             </div>
 
             <div class="dynamic-feed">
-                <!-- 🚨 FIX: Now only pulls from the 'news' bucket, protecting your PSIR notes! -->
                 {% for article in collections.news | reverse | limit(3) %}
                 <article class="news-card">
                     <div class="card-tag tag-{{ article.data.category }}">{{ article.data.category }}</div>
                     <h3 class="card-title"><a href="{{ article.url }}">{{ article.data.title }}</a></h3>
                     <p class="card-excerpt">{{ article.data.excerpt }}</p>
                     <div class="card-meta">
-                        <span class="author">By Desk Editor</span> • <span class="read-time">5 Min Read</span>
+                        <!-- DYNAMIC AUTHOR AND READ TIME -->
+                        <span class="author">By {{ article.data.author | default("Desk Editor") }}</span> • 
+                        <span class="read-time">{{ article.content | readingTime }}</span>
                     </div>
                 </article>
                 {% else %}
-                <p style="color: #64748B;">No news articles published yet.</p>
+                <p class="empty-state-text">No news articles published yet.</p>
                 {% endfor %}
             </div>
         </main>
 
-         <!-- RIGHT: 30% SIDEBAR -->
+         <!-- RIGHT: 30% SIDEBAR (NOW DYNAMIC) -->
         <aside class="sidebar">
             <div class="sidebar-widget">
                 <h3 class="widget-title">🔥 Most Read</h3>
                 <ul class="trending-list">
-                    <li>
-                        <span class="rank">1</span>
-                        <a href="https://bharatfrontier.com/" target="_blank">Why Is India Investing ₹80,000 Crore in a New Rajasthan Refinery?</a>
-                    </li>
-                    <li>
-                        <span class="rank">2</span>
-                        <a href="https://musingsofaditya.blogspot.com/2025/08/kuch-rabta-urdu-se.html" target="_blank">kuch rabta urdu se</a>
-                    </li>
+                    {% set rank = 1 %}
+                    {% for article in collections.news %}
+                        {% if article.data.trending == true and rank <= 5 %}
+                        <li>
+                            <span class="rank">{{ rank }}</span>
+                            <a href="{{ article.url }}">{{ article.data.title }}</a>
+                        </li>
+                        {% set rank = rank + 1 %}
+                        {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
         </aside>
@@ -87,48 +90,36 @@ layout: base.html
         </div>
     </section>
 
-    <!-- 4. 3-COLUMN CATEGORY GRID -->
+    <!-- 4. FLUID CATEGORY GRID -->
     <section class="category-grid">
+        <!-- Define the categories you want Eleventy to look for and generate columns for -->
+        {% set activeCategories = ["polity", "economy", "science", "defence", "history", "geography"] %}
         
-        <div class="cat-column border-polity">
-            <h3 class="cat-header bg-polity">Polity & Governance</h3>
-            <div class="cat-list">
-                {% for article in collections.news | reverse %}
-                    {% if article.data.category == "polity" %}
-                    <div class="mini-card">
-                        <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
+        {% for cat in activeCategories %}
+            <!-- Check if any articles exist for this category -->
+            {% set catHasArticles = false %}
+            {% for article in collections.news %}
+                {% if article.data.category == cat %}
+                    {% set catHasArticles = true %}
+                {% endif %}
+            {% endfor %}
 
-        <div class="cat-column border-economy">
-            <h3 class="cat-header bg-economy">Economy & Markets</h3>
-            <div class="cat-list">
-                {% for article in collections.news | reverse %}
-                    {% if article.data.category == "economy" %}
-                    <div class="mini-card">
-                        <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
-                    </div>
-                    {% endif %}
-                {% endfor %}
+            <!-- If articles exist, automatically generate the HTML column -->
+            {% if catHasArticles %}
+            <div class="cat-column border-{{ cat }}">
+                <h3 class="cat-header bg-{{ cat }}">{{ cat | capitalize }}</h3>
+                <div class="cat-list">
+                    {% for article in collections.news | reverse %}
+                        {% if article.data.category == cat %}
+                        <div class="mini-card">
+                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-
-        <div class="cat-column border-science">
-            <h3 class="cat-header bg-science">Science & Tech</h3>
-            <div class="cat-list">
-                {% for article in collections.news | reverse %}
-                    {% if article.data.category == "science" %}
-                    <div class="mini-card">
-                        <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-
+            {% endif %}
+        {% endfor %}
     </section>
 
     <!-- 5. BOTTOM SECTION: THE THREE ARCHIVE BASKETS -->
