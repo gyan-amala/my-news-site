@@ -1,9 +1,9 @@
 ---
 layout: psir-layout.njk
 title: "State and its Various Aspects"
-paper: "2"
-section: "B"
-topic: "India and the World"
+paper: "1"
+section: "A"
+topic: "Theories of State"
 subTopic: "State"
 contentType: "Note"
 ---
