@@ -1,46 +1,79 @@
 module.exports = function(eleventyConfig) {
   
-  // 1. STATIC ASSETS
-  // Tell Eleventy to copy your stylesheet and logo directly to the live site
+  // 1. GLOBAL DATA
+  // This exposes 'site.domain' and 'site.currentYear' to all Nunjucks templates
+  eleventyConfig.addGlobalData("site", {
+    domain: "https://gyanamala.in",
+    currentYear: new Date().getFullYear()
+  });
+
+  // 2. STATIC ASSETS
   eleventyConfig.addPassthroughCopy("style.css");
   eleventyConfig.addPassthroughCopy("logo-icon.png");
 
-  // 2. AUTOMATIC FOLDER COLLECTIONS
-  // This automatically grabs any markdown file dropped into your 'psir' folder 
-  // and groups it into 'collections.psir' for your study dashboard, no manual tags required!
+  // 3. AUTOMATIC COLLECTIONS
+  // The flat PSIR collection (still useful for general loops)
   eleventyConfig.addCollection("psir", function(collectionApi) {
     return collectionApi.getFilteredByGlob("psir/**/*.md");
   });
 
-  // Note: Eleventy automatically builds 'collections.news' and 'collections.daily' 
-  // because we added 'tags: news' and 'tags: daily' inside those specific markdown files.
+  // NEW: The Nested PSIR Tree (Paper -> Section -> Topic)
+  eleventyConfig.addCollection("psirTree", function(collectionApi) {
+    const psirNotes = collectionApi.getFilteredByGlob("psir/**/*.md");
+    const tree = {};
 
-  // 3. CUSTOM FILTERS
-  // The limit function for your homepage article grids
+    psirNotes.forEach(note => {
+      const paper = note.data.paper || "Uncategorized";
+      const section = note.data.section || "General";
+      const topic = note.data.topic || "Misc";
+
+      // Build the nested object architecture dynamically
+      if (!tree[paper]) tree[paper] = {};
+      if (!tree[paper][section]) tree[paper][section] = {};
+      if (!tree[paper][section][topic]) tree[paper][section][topic] = [];
+
+      tree[paper][section][topic].push(note);
+    });
+    
+    return tree;
+  });
+
+  // 4. CUSTOM FILTERS
   eleventyConfig.addFilter("limit", function(array, limit) {
     return array.slice(0, limit);
   });
 
-  // Converts raw dates (2026-07-06) into readable layouts (July 6, 2026)
+  // UPDATED: Formats dates as "7 July 2026" (Indian/British locale)
   eleventyConfig.addFilter("readableDate", function(dateVal) {
     if (!dateVal) return "";
     const dateObj = typeof dateVal === "string" ? new Date(dateVal) : dateVal;
-    return dateObj.toLocaleDateString("en-US", {
+    return dateObj.toLocaleDateString("en-IN", {
       day: "numeric",
       month: "long",
       year: "numeric"
     });
   });
 
-  // 4. CORE DIRECTORY SETTINGS
+  // NEW: Read Time Calculator
+  eleventyConfig.addFilter("readingTime", function(text) {
+    if (!text) return "1 Min Read";
+    const wordsPerMinute = 200;
+    // Strip HTML tags to only count actual words
+    const plainText = text.replace(/<[^>]*>?/gm, ''); 
+    const noOfWords = plainText.split(/\s+/).length;
+    const minutes = Math.ceil(noOfWords / wordsPerMinute);
+    return `${minutes} Min Read`;
+  });
+
+  // 5. CORE DIRECTORY SETTINGS
   return {
     dir: {
       input: ".",
       output: "_site",
-      includes: "_includes" // Explicitly tells Eleventy to look here for base.html and layouts
+      includes: "_includes"
     },
-    templateFormats: ["html", "njk", "md"], // Ensures it reads all your file types
+    templateFormats: ["html", "njk", "md"],
     htmlTemplateEngine: "njk",
-    markdownTemplateEngine: "njk" // Ensures Nunjucks logic works inside your Markdown files
+    markdownTemplateEngine: "njk"
   };
 };
