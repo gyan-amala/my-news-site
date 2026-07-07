@@ -1,0 +1,135 @@
+---
+layout: base.html
+permalink: /psir/index.html
+title: "UPSC PSIR Optional Master Hub"
+---
+
+<div class="psir-container" style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: system-ui, sans-serif;">
+  
+  <!-- 🌟 DASHBOARD HEADER -->
+  <header class="psir-header" style="text-align: center; margin-bottom: 40px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px;">
+    <h1 style="font-size: 2.5rem; color: #1a202c; margin-bottom: 10px;">📚 PSIR Optional Study Hub</h1>
+    <p style="font-size: 1.1rem; color: #4a5568; max-width: 700px; margin: 0 auto;">
+      Access comprehensive chapter-wise study notes, solved Previous Year Questions (PYQs), and high-yield model answers structured explicitly for the UPSC Civil Services Examination.
+    </p>
+  </header>
+
+  <!-- 🏛️ TWIN PILLARS: SYLLABUS COLUMNS -->
+  <div class="psir-columns" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+    
+    <!-- ============================================================================== -->
+    <!-- 📘 COLUMN 1: PAPER I -->
+    <!-- ============================================================================== -->
+    <section class="paper-column">
+      <div style="background-color: #ebf8ff; border-left: 5px solid #3182ce; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+        <h2 style="margin: 0; color: #2b6cb0; font-size: 1.4rem;">Paper I: Political Theory & Indian Politics</h2>
+      </div>
+
+      <div class="cards-list" style="display: flex; flex-direction: column; gap: 15px;">
+        {% set paper1Count = 0 %}
+        {% for note in collections.psir %}
+          {% if note.data.paper == "1" %}
+            {% set paper1Count = paper1Count + 1 %}
+            
+            <!-- Individual Card -->
+            <div class="note-card" style="border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span class="badge topic" style="font-size: 0.75rem; font-weight: bold; color: #718096; text-transform: uppercase;">
+                  {{ note.data.topic or "General" }}
+                </span>
+                
+                <!-- Dynamic Content Type Badge Style -->
+                {% if note.data.contentType == "PYQ" %}
+                  <span style="background-color: #feebc8; color: #c05621; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                    ✍️ PYQ {{ note.data.year }}
+                  </span>
+                {% elif note.data.contentType == "ModelAnswer" %}
+                  <span style="background-color: #faf5ff; color: #6b46c1; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                    💡 Model Answer
+                  </span>
+                {% else %}
+                  <span style="background-color: #e6fffa; color: #234e52; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                    📝 Note
+                  </span>
+                {% endif %}
+              </div>
+
+              <h3 style="margin: 0 0 10px 0; font-size: 1.15rem; color: #2d3748;">{{ note.data.title }}</h3>
+              
+              {% if note.data.subTopic %}
+                <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: #4a5568;">Focus: <strong>{{ note.data.subTopic }}</strong></p>
+              {% endif %}
+
+              <a href="{{ note.url }}" style="display: inline-block; background-color: #3182ce; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                Read Material →
+              </a>
+            </div>
+
+          {% endif %}
+        {% endfor %}
+
+        {% if paper1Count == 0 %}
+          <p style="color: #a0aec0; font-style: italic; text-align: center; padding: 20px;">No Paper I notes uploaded yet.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- ============================================================================== -->
+    <!-- 📙 COLUMN 2: PAPER II -->
+    <!-- ============================================================================== -->
+    <section class="paper-column">
+      <div style="background-color: #f7fafc; border-left: 5px solid #4a5568; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+        <h2 style="margin: 0; color: #2d3748; font-size: 1.4rem;">Paper II: Comparative & International Politics</h2>
+      </div>
+
+      <div class="cards-list" style="display: flex; flex-direction: column; gap: 15px;">
+        {% set paper2Count = 0 %}
+        {% for note in collections.psir %}
+          {% if note.data.paper == "2" %}
+            {% set paper2Count = paper2Count + 1 %}
+            
+            <!-- Individual Card -->
+            <div class="note-card" style="border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span class="badge topic" style="font-size: 0.75rem; font-weight: bold; color: #718096; text-transform: uppercase;">
+                  {{ note.data.topic or "General" }}
+                </span>
+                
+                <!-- Dynamic Content Type Badge Style -->
+                {% if note.data.contentType == "PYQ" %}
+                  <span style="background-color: #feebc8; color: #c05621; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                    ✍️ PYQ {{ note.data.year }}
+                  </span>
+                {% elif note.data.contentType == "ModelAnswer" %}
+                  <span style="background-color: #faf5ff; color: #6b46c1; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                    💡 Model Answer
+                  </span>
+                {% else %}
+                  <span style="background-color: #e6fffa; color: #234e52; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                    📝 Note
+                  </span>
+                {% endif %}
+              </div>
+
+              <h3 style="margin: 0 0 10px 0; font-size: 1.15rem; color: #2d3748;">{{ note.data.title }}</h3>
+              
+              {% if note.data.subTopic %}
+                <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: #4a5568;">Focus: <strong>{{ note.data.subTopic }}</strong></p>
+              {% endif %}
+
+              <a href="{{ note.url }}" style="display: inline-block; background-color: #4a5568; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                Read Material →
+              </a>
+            </div>
+
+          {% endif %}
+        {% endfor %}
+
+        {% if paper2Count == 0 %}
+          <p style="color: #a0aec0; font-style: italic; text-align: center; padding: 20px;">No Paper II notes uploaded yet.</p>
+        {% endif %}
+      </div>
+    </section>
+
+  </div>
+</div>
