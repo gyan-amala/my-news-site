@@ -1,207 +1,165 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gyan Amala | Independent Journalism</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/logo-icon.png">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/style.css">
-</head>
-<body>
+---
+layout: base.html
+---
 
-    <!-- Minimal Header with Logo -->
-    <header class="main-header">
-        <div class="header-inner">
-            <img src="/logo-icon.png" alt="Gyan Amala Logo" class="header-logo">
-            <h1 class="logo">GYAN AMALA</h1>
+<div class="wrapper">
+    
+    <!-- 1. TOP SECTION: THE DAILY BRIEFING WIRE -->
+    {% set latestBrief = collections.daily | reverse | first %}
+    {% if latestBrief %}
+    <section class="daily-brief-grid">
+        <div class="brief-card status-quote">
+            <span class="brief-badge">💬 QUOTE OF THE DAY</span>
+            <p class="quote-text">"{{ latestBrief.data.quoteText }}"</p>
+            <span class="quote-author">— {{ latestBrief.data.quoteAuthor }}</span>
         </div>
-    </header>
-
-    <div class="wrapper">
         
-        <!-- 1. TOP SECTION: THE DAILY BRIEFING WIRE -->
-        <!-- This automatically Grabs the latest entry from your daily log folder -->
-        {% set latestBrief = collections.daily | reverse | first %}
-        {% if latestBrief %}
-        <section class="daily-brief-grid">
-            
-            <!-- Quote Basket Item -->
-            <div class="brief-card status-quote">
-                <span class="brief-badge">💬 QUOTE OF THE DAY</span>
-                <p class="quote-text">"{{ latestBrief.data.quoteText }}"</p>
-                <span class="quote-author">— {{ latestBrief.data.quoteAuthor }}</span>
-            </div>
-            
-            <!-- History Basket Item -->
-            <div class="brief-card status-history">
-                <span class="brief-badge">⏳ ON THIS DAY</span>
-                <h4 class="history-year">Year: {{ latestBrief.data.historyYear }}</h4>
-                <p class="history-text">{{ latestBrief.data.historyEvent }}</p>
-            </div>
-            
-            <!-- Fact Basket Item -->
-            <div class="brief-card status-fact">
-                <span class="brief-badge">💡 DID YOU KNOW?</span>
-                <p class="fact-text">{{ latestBrief.data.randomFact }}</p>
-            </div>
-            
-        </section>
-        {% endif %}
-
-        <!-- 2. MIDDLE SECTION: 70/30 SPLIT LAYOUT -->
-        <div class="split-layout">
-            
-            <!-- LEFT: 70% MAIN FEED -->
-            <main class="main-content">
-                <div class="section-heading">
-                    <div class="heading-dot"></div>
-                    <h2>The Latest Wire</h2>
-                </div>
-
-                <div class="dynamic-feed">
-                    <!-- The Eleventy Loop for the 3 most recent articles -->
-                    {% for article in collections.all | reverse | limit(3) %}
-                    <article class="news-card">
-                        <div class="card-tag tag-{{ article.data.category }}">{{ article.data.category }}</div>
-                        <h3 class="card-title"><a href="{{ article.url }}">{{ article.data.title }}</a></h3>
-                        <p class="card-excerpt">{{ article.data.excerpt }}</p>
-                        <div class="card-meta">
-                            <span class="author">By Desk Editor</span> • <span class="read-time">5 Min Read</span>
-                        </div>
-                    </article>
-                    {% endfor %}
-                </div>
-            </main>
-
-             <!-- RIGHT: 30% SIDEBAR -->
-            <aside class="sidebar">
-                <!-- Trending List -->
-                <div class="sidebar-widget">
-                    <h3 class="widget-title">🔥 Most Read</h3>
-                    <ul class="trending-list">
-                        <li>
-                            <span class="rank">1</span>
-                            <a href="https://bharatfrontier.com/" target="_blank">Why Is India Investing ₹80,000 Crore in a New Rajasthan Refinery?</a>
-                        </li>
-                        <li>
-                            <span class="rank">2</span>
-                            <a href="https://musingsofaditya.blogspot.com/2025/08/kuch-rabta-urdu-se.html" target="_blank">kuch rabta urdu se</a>
-                        </li>
-                        <li>
-                            <span class="rank">3</span>
-                            <a href="https://bharatfrontier.com/" target="_blank">Why Is India Investing ₹80,000 Crore in a New Rajasthan Refinery?</a>
-                        </li>
-                    </ul>
-                </div>
-            </aside>
+        <div class="brief-card status-history">
+            <span class="brief-badge">⏳ ON THIS DAY</span>
+            <h4 class="history-year">Year: {{ latestBrief.data.historyYear }}</h4>
+            <p class="history-text">{{ latestBrief.data.historyEvent }}</p>
         </div>
+        
+        <div class="brief-card status-fact">
+            <span class="brief-badge">💡 DID YOU KNOW?</span>
+            <p class="fact-text">{{ latestBrief.data.randomFact }}</p>
+        </div>
+    </section>
+    {% endif %}
 
-        <!-- 3. FULL WIDTH BREAK: TRENDING HIGHLIGHTS -->
-        <section class="trending-banner">
-            <div class="banner-badge">★ TOP STORIES</div>
-            <div class="banner-grid">
-                {% for article in collections.all %}
-                    {% if article.data.trending == true %}
-                    <div class="banner-card">
+    <!-- 2. MIDDLE SECTION: 70/30 SPLIT LAYOUT -->
+    <div class="split-layout">
+        
+        <!-- LEFT: 70% MAIN FEED -->
+        <main class="main-content">
+            <div class="section-heading">
+                <div class="heading-dot"></div>
+                <h2>The Latest Wire</h2>
+            </div>
+
+            <div class="dynamic-feed">
+                <!-- 🚨 FIX: Now only pulls from the 'news' bucket, protecting your PSIR notes! -->
+                {% for article in collections.news | reverse | limit(3) %}
+                <article class="news-card">
+                    <div class="card-tag tag-{{ article.data.category }}">{{ article.data.category }}</div>
+                    <h3 class="card-title"><a href="{{ article.url }}">{{ article.data.title }}</a></h3>
+                    <p class="card-excerpt">{{ article.data.excerpt }}</p>
+                    <div class="card-meta">
+                        <span class="author">By Desk Editor</span> • <span class="read-time">5 Min Read</span>
+                    </div>
+                </article>
+                {% else %}
+                <p style="color: #64748B;">No news articles published yet.</p>
+                {% endfor %}
+            </div>
+        </main>
+
+         <!-- RIGHT: 30% SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-widget">
+                <h3 class="widget-title">🔥 Most Read</h3>
+                <ul class="trending-list">
+                    <li>
+                        <span class="rank">1</span>
+                        <a href="https://bharatfrontier.com/" target="_blank">Why Is India Investing ₹80,000 Crore in a New Rajasthan Refinery?</a>
+                    </li>
+                    <li>
+                        <span class="rank">2</span>
+                        <a href="https://musingsofaditya.blogspot.com/2025/08/kuch-rabta-urdu-se.html" target="_blank">kuch rabta urdu se</a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 3. FULL WIDTH BREAK: TRENDING HIGHLIGHTS -->
+    <section class="trending-banner">
+        <div class="banner-badge">★ TOP STORIES</div>
+        <div class="banner-grid">
+            {% for article in collections.news %}
+                {% if article.data.trending == true %}
+                <div class="banner-card">
+                    <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                    <p>{{ article.data.excerpt }}</p>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- 4. 3-COLUMN CATEGORY GRID -->
+    <section class="category-grid">
+        
+        <div class="cat-column border-polity">
+            <h3 class="cat-header bg-polity">Polity & Governance</h3>
+            <div class="cat-list">
+                {% for article in collections.news | reverse %}
+                    {% if article.data.category == "polity" %}
+                    <div class="mini-card">
                         <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
-                        <p>{{ article.data.excerpt }}</p>
                     </div>
                     {% endif %}
                 {% endfor %}
             </div>
-        </section>
+        </div>
 
-        <!-- 4. 3-COLUMN CATEGORY GRID -->
-        <section class="category-grid">
-            
-            <div class="cat-column border-polity">
-                <h3 class="cat-header bg-polity">Polity & Governance</h3>
-                <div class="cat-list">
-                    {% for article in collections.all | reverse %}
-                        {% if article.data.category == "polity" %}
-                        <div class="mini-card">
-                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+        <div class="cat-column border-economy">
+            <h3 class="cat-header bg-economy">Economy & Markets</h3>
+            <div class="cat-list">
+                {% for article in collections.news | reverse %}
+                    {% if article.data.category == "economy" %}
+                    <div class="mini-card">
+                        <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="cat-column border-science">
+            <h3 class="cat-header bg-science">Science & Tech</h3>
+            <div class="cat-list">
+                {% for article in collections.news | reverse %}
+                    {% if article.data.category == "science" %}
+                    <div class="mini-card">
+                        <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+    </section>
+
+    <!-- 5. BOTTOM SECTION: THE THREE ARCHIVE BASKETS -->
+    <section class="archive-baskets-section">
+        <div class="section-heading">
+            <div class="heading-dot basket-dot"></div>
+            <h2>Knowledge Baskets (Back Issues)</h2>
+        </div>
+        
+        <div class="baskets-grid">
+            <div class="basket-card border-quote">
+                <div class="basket-icon">🏺</div>
+                <h3 class="basket-title">The Vault of Wisdom</h3>
+                <p class="basket-desc">Missed a day? Take a stroll through every perspective, philosophy, and quote we've ever logged.</p>
+                <a href="/archives/quotes/" class="basket-btn">Open Quote Basket →</a>
             </div>
 
-            <div class="cat-column border-economy">
-                <h3 class="cat-header bg-economy">Economy & Markets</h3>
-                <div class="cat-list">
-                    {% for article in collections.all | reverse %}
-                        {% if article.data.category == "economy" %}
-                        <div class="mini-card">
-                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+            <div class="basket-card border-history">
+                <div class="basket-icon">📜</div>
+                <h3 class="basket-title">Echoes of Time</h3>
+                <p class="basket-desc">A deep-dive chronological timeline of historic global and regional events occurring on this day.</p>
+                <a href="/archives/history/" class="basket-btn">Open History Basket →</a>
             </div>
 
-            <div class="cat-column border-science">
-                <h3 class="cat-header bg-science">Science & Tech</h3>
-                <div class="cat-list">
-                    {% for article in collections.all | reverse %}
-                        {% if article.data.category == "science" %}
-                        <div class="mini-card">
-                            <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+            <div class="basket-card border-fact">
+                <div class="basket-icon">🧬</div>
+                <h3 class="basket-title">The Curiosity Shop</h3>
+                <p class="basket-desc">Uncover random facts, science anomalies, and mini trivia bits preserved from our daily logs.</p>
+                <a href="/archives/facts/" class="basket-btn">Open Fact Basket →</a>
             </div>
+        </div>
+    </section>
 
-        </section>
-
-        <!-- 5. BOTTOM SECTION: THE THREE ARCHIVE BASKETS -->
-        <section class="archive-baskets-section">
-            <div class="section-heading">
-                <div class="heading-dot basket-dot"></div>
-                <h2>Knowledge Baskets (Back Issues)</h2>
-            </div>
-            
-            <div class="baskets-grid">
-                
-                <!-- Basket 1: Quotes -->
-                <div class="basket-card border-quote">
-                    <div class="basket-icon">🏺</div>
-                    <h3 class="basket-title">The Vault of Wisdom</h3>
-                    <p class="basket-desc">Missed a day? Take a stroll through every perspective, philosophy, and quote we've ever logged.</p>
-                    <a href="/archives/quotes/" class="basket-btn">Open Quote Basket →</a>
-                </div>
-
-                <!-- Basket 2: History -->
-                <div class="basket-card border-history">
-                    <div class="basket-icon">📜</div>
-                    <h3 class="basket-title">Echoes of Time</h3>
-                    <p class="basket-desc">A deep-dive chronological timeline of historic global and regional events occurring on this day.</p>
-                    <a href="/archives/history/" class="basket-btn">Open History Basket →</a>
-                </div>
-
-                <!-- Basket 3: Facts -->
-                <div class="basket-card border-fact">
-                    <div class="basket-icon">🧬</div>
-                    <h3 class="basket-title">The Curiosity Shop</h3>
-                    <p class="basket-desc">Uncover random facts, science anomalies, and mini trivia bits preserved from our daily logs.</p>
-                    <a href="/archives/facts/" class="basket-btn">Open Fact Basket →</a>
-                </div>
-
-            </div>
-        </section>
-
-    </div>
-
-    <footer>
-        <p>© 2026 Gyan Amala. Independent Journalism.</p>
-    </footer>
-
-</body>
-</html>
+</div>
