@@ -3,7 +3,7 @@ layout: "psir-layout.njk"
 title: "Liberty, Equality, and Justice: Interconnected Concepts in Political Philosophy"
 paper: "1"
 section: "A"
-topic: "Justice"
+topic: ""
 subTopic: "Rawls Theory and Communitarian Critiques"
 contentType: "Note"
 tags:
