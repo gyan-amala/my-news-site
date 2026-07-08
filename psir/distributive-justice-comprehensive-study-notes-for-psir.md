@@ -3,7 +3,7 @@ layout: psir-layout.njk
 title: "Distributive Justice: Comprehensive Study Notes for PSIR"
 paper: "1"
 section: "A"
-topic: "Western Political Thought"
+topic: "Justice"
 subTopic: "Distributive Justice"
 contentType: "Note"
 ---
