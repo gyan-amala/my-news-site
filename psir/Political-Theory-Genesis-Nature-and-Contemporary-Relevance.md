@@ -7,7 +7,7 @@ topic: "Political Theory"
 subTopic: "Genesis, Nature, and Contemporary Relevance"
 contentType: "Note"
 ---
-# **PATH A: REVISION NOTES**
+# **REVISION NOTES**
 
 ## **Topic: Political Theory – Genesis, Nature, and Contemporary Relevance**
 
