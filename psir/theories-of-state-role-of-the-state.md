@@ -3,12 +3,12 @@ layout: psir-layout.njk
 title: "Theories of State: Role of the State"
 paper: "1"
 section: "A"
-topic: "Political Theory"
+topic: "Theories of State"
 subTopic: "Role of the State"
 contentType: "Note"
 ---
 
-# Theories of State: Role of the State (UPSC PSIR Study Notes)
+# Theories of State: Role of the State 
 
 ## 1. Syllabus Mapping
 * **Paper:** Paper I (Political Theory and Indian Politics)
