@@ -1,3 +1,13 @@
+---
+layout: "psir-layout.njk"
+title: " GS 1 Mains Microthemes Prioritized Analysis"
+paper: ""
+section: ""
+topic: ""
+subTopic: ""
+contentType: "Note"
+---
+
 # GS 1 Mains Microthemes Prioritized Analysis
 
 This document categorizes all UPSC GS 1 Mains microthemes based on priority (Total Marks asked from 2013-2025) and outlines the nature of questions for each.
