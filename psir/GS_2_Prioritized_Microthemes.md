@@ -1,3 +1,14 @@
+---
+layout: "psir-layout.njk"
+title: " GS 2 Mains Microthemes Prioritized Analysis"
+paper: ""
+section: ""
+topic: ""
+subTopic: ""
+contentType: "Note"
+---
+
+
 # GS 2 Mains Microthemes Analysis & Prioritization (2013-2025)
 
 This document provides a prioritized breakdown of microthemes from the GS-II Mains syllabus, sorted by their total weightage in marks based on the UPSC year-wise PYQ analysis spanning 2013-2025. It outlines the specific focus areas and nature of questions asked within each theme to aid targeted and high-yield preparation.
