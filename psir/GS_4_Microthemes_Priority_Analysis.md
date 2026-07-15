@@ -1,3 +1,13 @@
+---
+layout: "psir-layout.njk"
+title: " GS 4 Mains Microthemes Prioritized Analysis"
+paper: ""
+section: ""
+topic: ""
+subTopic: ""
+contentType: "Note"
+---
+
 # GS 4 (Ethics, Integrity and Aptitude) - Microtheme Priority Analysis (2013-2025)
 
 This document categorizes all microthemes from the UPSC GS Paper 4 syllabus based on their historical frequency and weightage in the Mains examinations (2013-2025). The major topics and their respective microthemes are arranged in descending order of **priority** (highest question frequency to lowest). 
