@@ -1,3 +1,12 @@
+---
+layout: "psir-layout.njk"
+title: " GS 3 Mains Microthemes Prioritized Analysis"
+paper: ""
+section: ""
+topic: ""
+subTopic: ""
+contentType: "Note"
+---
 
 # GS 3 Mains Microthemes Priority & Question Analysis (2013-2025)
 
