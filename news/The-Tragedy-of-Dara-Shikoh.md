@@ -1,6 +1,6 @@
 ---
 layout: article-layout.njk
-tags: history
+tags: news
 title: "The Ultimate 'What If': The Tragedy of Dara Shikoh"
 excerpt: "A casual dive into the biggest turning point in Indian history—the philosopher-prince who lost an empire, and how his defeat changed the subcontinent forever."
 category: "history"
