@@ -4,7 +4,7 @@ tags: news
 title: "Echoes of Empire: The Indian Independence Movement in the Context of Global Decolonization"
 excerpt: "An analysis of the Indian independence movement alongside contemporary anti-colonial struggles, examining the methodological, ideological, and geopolitical factors that defined the global dismantling of European imperialism."
 category: "history"
-trending: false
+trending: true
 author: "Desk Editor"
 ---
 
