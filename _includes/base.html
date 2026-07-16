@@ -28,11 +28,11 @@
             </label>
 
             <nav class="main-nav" aria-label="Main Navigation">
-    <a href="/" class="nav-link">News Feed</a>
-    <a href="/psir/" class="nav-link psir-btn">PSIR</a>
-    <a href="/gs/" class="nav-link">GS</a>
-    <a href="/essay/" class="nav-link">Essay</a>
-     </nav>
+                <a href="/" class="nav-link {% if page.url == '/' %}active-nav{% endif %}">News Feed</a>
+                <a href="/psir/" class="nav-link {% if '/psir/' in page.url %}active-nav{% endif %}">PSIR</a>
+                <a href="/gs/" class="nav-link {% if '/gs/' in page.url %}active-nav{% endif %}">GS</a>
+                <a href="/essay/" class="nav-link {% if '/essay/' in page.url %}active-nav{% endif %}">Essay</a>
+                 </nav>
 
         </div>
     </header>
