@@ -348,7 +348,12 @@ a { text-decoration: none; transition: all 0.2s ease; }
     border: 1px solid #E2E8F0;
 }
 .cat-header { padding: 20px; color: white; font-size: 1.2rem; margin: 0; }
-.cat-list { padding: 20px; }
+.cat-list { 
+    padding: 20px; 
+    max-height: 400px; 
+    overflow-y: auto;  
+} 
+
 .mini-card { padding: 15px 0; border-bottom: 1px solid #E2E8F0; }
 .mini-card:last-child { border-bottom: none; padding-bottom: 0; }
 .mini-card h4 a { color: var(--text-dark); font-size: 1.05rem; font-weight: 700; }
