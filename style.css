@@ -94,12 +94,22 @@ a { text-decoration: none; transition: all 0.2s ease; }
     padding: 10px 15px; 
 }
 
-.psir-btn {
+/* Dynamic Active State for Navigation */
+.main-nav .nav-link {
+    border-radius: 8px;
+}
+
+.main-nav .nav-link:hover {
+    background: #F1F5F9;
+    color: var(--color-polity);
+}
+
+.main-nav .active-nav {
     color: var(--color-polity);
     background: #EFF6FF;
-    border-radius: 8px;
     font-weight: 700;
 }
+
 
 .nav-toggle, .nav-toggle-label { display: none; }
 
