@@ -1,0 +1,152 @@
+---
+layout: base.html
+title: "Pro Image Resizer | Gyan Amala"
+permalink: /resizer/
+---
+
+<!-- Tool-Specific Styles -->
+<style>
+  .resizer-ui { max-width: 650px; margin: 40px auto; background: var(--card-bg); padding: 30px; border-radius: var(--radius); border: 1px solid #E2E8F0; box-shadow: var(--shadow-soft); }
+  .control-group { margin-bottom: 1.5rem; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+  .control-group label { display: block; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-dark); }
+  .control-group input[type="number"], .control-group select { padding: 0.5rem; width: 120px; border: 1px solid #E2E8F0; border-radius: 4px; font-family: inherit; }
+  
+  .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-top: 1.25rem; }
+  .checkbox-group label { margin: 0; cursor: pointer; }
+  
+  .preview-container { margin-top: 2rem; border: 2px dashed #E2E8F0; padding: 1rem; text-align: center; border-radius: 8px; }
+  #preview { max-width: 100%; height: auto; display: none; margin-top: 1rem; border-radius: 4px; box-shadow: var(--shadow-soft); }
+  
+  .action-btn { padding: 0.75rem 1.5rem; background: var(--color-polity); color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+  .action-btn:hover { background: #2563EB; box-shadow: var(--shadow-hover); }
+  .action-btn:disabled { background: #94A3B8; cursor: not-allowed; box-shadow: none; }
+</style>
+
+<!-- Using your existing wrapper for proper site alignment -->
+<div class="wrapper">
+  
+  <div class="resizer-ui">
+    <h2 style="margin-bottom: 20px;">Optimize Your Images</h2>
+    
+    <div class="control-group">
+      <input type="file" id="upload" accept="image/png, image/jpeg, image/webp, image/avif">
+    </div>
+
+    <div class="control-group">
+      <div>
+        <label for="width">Width (px)</label>
+        <input type="number" id="width" disabled>
+      </div>
+      <div>
+        <label for="height">Height (px)</label>
+        <input type="number" id="height" disabled>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="lockRatio" checked>
+        <label for="lockRatio">Keep Aspect Ratio</label>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div>
+        <label for="format">Output Format</label>
+        <select id="format">
+          <option value="image/webp">WebP (Best for web)</option>
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/png">PNG</option>
+        </select>
+      </div>
+      <div>
+        <label for="quality">Quality (<span id="qualityVal">80</span>%)</label>
+        <input type="range" id="quality" min="10" max="100" value="80" style="width: 150px;">
+      </div>
+    </div>
+
+    <button id="processBtn" class="action-btn" disabled>Generate & Download</button>
+
+    <div class="preview-container">
+      <p style="margin:0; color:var(--text-muted);">Live Preview</p>
+      <img id="preview" alt="Resized preview">
+    </div>
+  </div>
+
+</div>
+
+<!-- Load Pica Library -->
+<script src="https://cdn.jsdelivr.net/npm/pica@9.0.1/dist/pica.min.js"></script>
+
+<!-- The Resizer Logic -->
+<script>
+  const state = { originalImage: new Image(), originalRatio: 1, currentFileName: '' };
+  const els = {
+    upload: document.getElementById('upload'), width: document.getElementById('width'),
+    height: document.getElementById('height'), lockRatio: document.getElementById('lockRatio'),
+    format: document.getElementById('format'), quality: document.getElementById('quality'),
+    qualityVal: document.getElementById('qualityVal'), processBtn: document.getElementById('processBtn'),
+    preview: document.getElementById('preview')
+  };
+
+  const picaRunner = pica();
+
+  els.upload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    state.currentFileName = file.name;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      state.originalImage.onload = () => {
+        els.width.value = state.originalImage.width;
+        els.height.value = state.originalImage.height;
+        state.originalRatio = state.originalImage.width / state.originalImage.height;
+        els.width.disabled = false; els.height.disabled = false; els.processBtn.disabled = false;
+      };
+      state.originalImage.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  els.width.addEventListener('input', () => {
+    if (els.lockRatio.checked && state.originalImage.src) els.height.value = Math.round(els.width.value / state.originalRatio);
+  });
+
+  els.height.addEventListener('input', () => {
+    if (els.lockRatio.checked && state.originalImage.src) els.width.value = Math.round(els.height.value * state.originalRatio);
+  });
+
+  els.quality.addEventListener('input', (e) => els.qualityVal.textContent = e.target.value);
+
+  els.processBtn.addEventListener('click', async () => {
+    if (!state.originalImage.src) return;
+    els.processBtn.textContent = 'Processing...'; els.processBtn.disabled = true;
+
+    const targetWidth = parseInt(els.width.value, 10), targetHeight = parseInt(els.height.value, 10);
+    const mimeType = els.format.value, qualityFloat = parseInt(els.quality.value, 10) / 100;
+
+    const srcCanvas = document.createElement('canvas');
+    srcCanvas.width = state.originalImage.width; srcCanvas.height = state.originalImage.height;
+    srcCanvas.getContext('2d').drawImage(state.originalImage, 0, 0);
+
+    const destCanvas = document.createElement('canvas');
+    destCanvas.width = targetWidth; destCanvas.height = targetHeight;
+
+    try {
+      await picaRunner.resize(srcCanvas, destCanvas, { unsharpAmount: 80, unsharpRadius: 0.6, unsharpThreshold: 2 });
+      const blob = await picaRunner.toBlob(destCanvas, mimeType, qualityFloat);
+      const blobUrl = URL.createObjectURL(blob);
+      
+      els.preview.src = blobUrl; els.preview.style.display = 'inline-block';
+
+      const downloadLink = document.createElement('a');
+      downloadLink.href = blobUrl;
+      const baseName = state.currentFileName.substring(0, state.currentFileName.lastIndexOf('.'));
+      downloadLink.download = `${baseName}-resized.${mimeType.split('/')[1]}`;
+      downloadLink.click();
+    } catch (error) {
+      console.error("Resizing failed:", error);
+      alert("Something went wrong while processing the image.");
+    } finally {
+      els.processBtn.textContent = 'Generate & Download'; els.processBtn.disabled = false;
+    }
+  });
+</script>
+
