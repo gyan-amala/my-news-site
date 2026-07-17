@@ -123,11 +123,14 @@ permalink: /share/
 </div>
 
 <script>
-console.log("Is the script running?");
-  const supabaseUrl = 'https://ygosowoqpktyitknoyxl.supabase.co'; 
-  const supabaseKey = 'sb_publishable_1JvKIo-CfPgQftYLA-4-rw_45xqWbNQ'; 
+  console.log("Is the script running?");
   
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  const supabaseUrl = 'https://ygosowoqpktyitknoyxl.supabase.co'; 
+  const supabaseKey = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlnb3Nvd29xcGt0eWl0a25veXhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyNzI3MzYsImV4cCI6MjA5OTg0ODczNn0.UoU49ePaefbRCU-mSAcEMPKKM3IQU5HxqtY-Tx3HC1U'; 
+  
+  // Safely initialize the client from the CDN
+  const { createClient } = window.supabase;
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
   const sendBtn = document.getElementById('sendBtn');
   const fileUpload = document.getElementById('fileUpload');
@@ -145,8 +148,8 @@ console.log("Is the script running?");
     const filePath = `${code}_${file.name}`;
 
     try {
-      // DEBUG: Step A - Try to upload
-      const { data: upData, error: uploadError } = await supabase.storage
+      // Step A - Try to upload
+      const { data: upData, error: uploadError } = await supabaseClient.storage
         .from('shared_files')
         .upload(filePath, file);
       
@@ -155,8 +158,8 @@ console.log("Is the script running?");
         throw uploadError;
       }
 
-      // DEBUG: Step B - Try to insert into database
-      const { error: dbError } = await supabase
+      // Step B - Try to insert into database
+      const { error: dbError } = await supabaseClient
         .from('shares')
         .insert([{ code: code, file_path: filePath }]);
 
@@ -177,6 +180,7 @@ console.log("Is the script running?");
       sendBtn.disabled = false;
     }
   });
+
   // ==========================================
   // RECEIVER LOGIC (DOWNLOAD & DESTROY)
   // ==========================================
@@ -192,7 +196,7 @@ console.log("Is the script running?");
 
     try {
       // Step A: Check the Database Ledger for the code
-      const { data: shareData, error: fetchError } = await supabase
+      const { data: shareData, error: fetchError } = await supabaseClient
         .from('shares')
         .select('file_path')
         .eq('code', code)
@@ -209,7 +213,7 @@ console.log("Is the script running?");
       receiveBtn.innerText = "Downloading...";
 
       // Step B: Download the file from the Storage Bucket
-      const { data: fileData, error: downloadError } = await supabase.storage
+      const { data: fileData, error: downloadError } = await supabaseClient.storage
         .from('shared_files')
         .download(filePath);
 
@@ -227,8 +231,8 @@ console.log("Is the script running?");
       URL.revokeObjectURL(url);
 
       // Step C: Self-Destruct! Delete from Database and Storage
-      await supabase.from('shares').delete().eq('code', code);
-      await supabase.storage.from('shared_files').remove([filePath]);
+      await supabaseClient.from('shares').delete().eq('code', code);
+      await supabaseClient.storage.from('shared_files').remove([filePath]);
 
       receiveCode.value = '';
       alert("Download complete! The file has now been permanently deleted from the server.");
