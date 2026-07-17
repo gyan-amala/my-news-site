@@ -6,23 +6,26 @@ permalink: /sudoku/
 
 <!-- Tool-Specific Styles -->
 <style>
+  /* Base Container */
   .sudoku-ui {
+    width: 100%;
     max-width: 500px;
-    margin: 40px auto;
-    background: var(--card-bg);
-    padding: 30px 20px;
-    border-radius: var(--radius);
+    margin: 20px auto;
+    background: var(--card-bg, #ffffff);
+    padding: clamp(15px, 4vw, 30px) clamp(10px, 3vw, 20px);
+    border-radius: var(--radius, 12px);
     border: 1px solid #E2E8F0;
-    box-shadow: var(--shadow-soft);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    box-sizing: border-box;
   }
 
-  .sudoku-header { text-align: center; margin-bottom: 25px; }
-  .sudoku-header h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--text-dark); }
-  .sudoku-header p { color: var(--text-muted); font-size: 0.95rem; }
+  .sudoku-header { text-align: center; margin-bottom: 20px; }
+  .sudoku-header h2 { font-size: clamp(1.4rem, 5vw, 1.8rem); margin-bottom: 5px; color: var(--text-dark, #0F172A); }
+  .sudoku-header p { color: var(--text-muted, #64748B); font-size: clamp(0.85rem, 3vw, 0.95rem); margin: 0; }
 
   /* Controls */
-  .diff-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+  .diff-controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
   .diff-btn {
     background: #F1F5F9;
     border: 1px solid #E2E8F0;
@@ -31,70 +34,83 @@ permalink: /sudoku/
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;
-    color: var(--text-muted);
+    color: var(--text-muted, #64748B);
     transition: all 0.2s;
+    flex: 1;
+    max-width: 100px;
   }
-  .diff-btn:hover { border-color: var(--color-polity); color: var(--text-dark); }
-  .diff-btn.active { background: var(--text-dark); color: white; border-color: var(--text-dark); }
+  .diff-btn:hover { border-color: var(--color-polity, #3B82F6); color: var(--text-dark, #0F172A); }
+  .diff-btn.active { background: var(--text-dark, #0F172A); color: white; border-color: var(--text-dark, #0F172A); }
 
-  /* The Grid */
+  /* The Grid - Fully Fluid */
   .sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
     width: 100%;
-    max-width: 400px;
+    max-width: min(100%, 65vh); 
+    aspect-ratio: 1;
     margin: 0 auto 25px auto;
-    border: 2px solid var(--text-dark);
-    background: var(--text-dark);
-    gap: 1px; /* Creates the thin inner borders */
+    border: 2px solid var(--text-dark, #0F172A);
+    background: var(--text-dark, #0F172A);
+    gap: 1px;
   }
 
   .cell {
     background: white;
-    aspect-ratio: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: clamp(1rem, 4.5vw, 1.4rem);
     font-weight: 700;
     cursor: pointer;
     user-select: none;
     transition: background 0.1s;
+    padding: 0;
   }
 
-  /* 3x3 Block Styling (Thick borders) */
-  .cell:nth-child(3n) { border-right: 2px solid var(--text-dark); }
+  /* 3x3 Block Styling */
+  .cell:nth-child(3n) { border-right: 2px solid var(--text-dark, #0F172A); }
   .cell:nth-child(9n) { border-right: none; }
   .cell:nth-child(n+19):nth-child(-n+27),
-  .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--text-dark); }
+  .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--text-dark, #0F172A); }
 
   /* Cell States */
-  .cell.fixed { color: var(--text-dark); cursor: default; background: #F8FAFC; }
-  .cell.user-input { color: var(--color-polity); }
-  .cell.selected { background: #EFF6FF !important; outline: 2px solid var(--color-polity); z-index: 10; }
-  .cell.error { color: var(--color-history); background: #FEF2F2 !important; }
+  .cell.fixed { color: var(--text-dark, #0F172A); cursor: default; background: #F8FAFC; }
+  .cell.user-input { color: var(--color-polity, #3B82F6); }
+  .cell.selected { background: #EFF6FF !important; outline: 2px solid var(--color-polity, #3B82F6); z-index: 10; }
+  .cell.error { color: var(--color-history, #EF4444); background: #FEF2F2 !important; }
 
-  /* Mobile Numpad */
+  /* Mobile-Optimized Numpad (2 rows of 5) */
   .numpad {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    gap: 8px;
+    width: 100%;
     max-width: 400px;
     margin: 0 auto;
   }
   .num-btn {
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
-    padding: 12px 0;
+    padding: clamp(8px, 2vw, 12px) 0;
     border-radius: 8px;
-    font-size: 1.2rem;
+    font-size: clamp(1.1rem, 4vw, 1.2rem);
     font-weight: 700;
-    color: var(--text-dark);
+    color: var(--text-dark, #0F172A);
     cursor: pointer;
     transition: background 0.1s;
+    touch-action: manipulation; 
   }
   .num-btn:active { background: #E2E8F0; }
-  .btn-erase { grid-column: span 5; background: #FEF2F2; color: var(--color-history); border-color: #FECACA; }
+  
+  .btn-erase { 
+    grid-column: span 2; 
+    background: #FEF2F2; 
+    color: var(--color-history, #EF4444); 
+    border-color: #FECACA; 
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+  }
 
   /* Win Message */
   .win-overlay {
@@ -140,13 +156,16 @@ permalink: /sudoku/
   </div>
 </div>
 
+<!-- Open Source Sudoku Generator Library -->
+<script src="https://cdn.jsdelivr.net/npm/sudoku-gen@2.1.2/dist/sudoku-gen.min.js"></script>
+
 <script>
   // Game State
   const state = {
     puzzle: [],
     solution: [],
     userGrid: [],
-    selectedCell: null // {r, c}
+    selectedCell: null
   };
 
   const els = {
@@ -172,48 +191,41 @@ permalink: /sudoku/
       state.puzzle = parsed.puzzle;
       state.solution = parsed.solution;
       state.userGrid = parsed.userGrid;
-      return true; // Successfully loaded saved game
+      return true;
     }
-    return false; // No saved game found
+    return false;
   }
 
   function clearSavedGame() {
     localStorage.removeItem('gyanAmalaSudoku');
   }
 
-  // --- 2. SUDOKU GENERATOR ---
+  // --- 2. SUDOKU GENERATOR (Using open-source library) ---
   function generateBoard(difficulty) {
-    // Base valid board
-    let b = [
-      [1,2,3,4,5,6,7,8,9], [4,5,6,7,8,9,1,2,3], [7,8,9,1,2,3,4,5,6],
-      [2,3,4,5,6,7,8,9,1], [5,6,7,8,9,1,2,3,4], [8,9,1,2,3,4,5,6,7],
-      [3,4,5,6,7,8,9,1,2], [6,7,8,9,1,2,3,4,5], [9,1,2,3,4,5,6,7,8]
-    ];
+    let libDifficulty = 'easy';
+    if (difficulty === 'medium') libDifficulty = 'medium';
+    if (difficulty === 'hard') libDifficulty = 'hard';
 
-    // Shuffle rows within 3x3 bands to randomize
-    const swap = (r1, r2) => { let t = b[r1]; b[r1] = b[r2]; b[r2] = t; };
-    for(let i=0; i<3; i++) {
-      let band = i*3;
-      if(Math.random() > 0.5) swap(band, band+1);
-      if(Math.random() > 0.5) swap(band+1, band+2);
-      if(Math.random() > 0.5) swap(band, band+2);
-    }
+    const generated = window.getSudoku(libDifficulty);
 
-    state.solution = b.map(row => [...row]);
-    state.puzzle = b.map(row => [...row]);
-
-    // Punch holes based on difficulty
-    let blanks = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 45 : 55;
-    while(blanks > 0) {
-      let r = Math.floor(Math.random() * 9), c = Math.floor(Math.random() * 9);
-      if(state.puzzle[r][c] !== 0) {
-        state.puzzle[r][c] = 0;
-        blanks--;
+    const stringToArray = (str) => {
+      let grid = [];
+      for (let r = 0; r < 9; r++) {
+        let row = [];
+        for (let c = 0; c < 9; c++) {
+          let char = str[r * 9 + c];
+          row.push(char === '-' ? 0 : parseInt(char));
+        }
+        grid.push(row);
       }
-    }
-    
+      return grid;
+    };
+
+    state.puzzle = stringToArray(generated.puzzle);
+    state.solution = stringToArray(generated.solution);
     state.userGrid = state.puzzle.map(row => [...row]);
-    saveGame(); // Save immediately when a new game starts
+    
+    saveGame(); 
   }
 
   // --- 3. UI RENDERING ---
@@ -245,7 +257,7 @@ permalink: /sudoku/
   }
 
   function selectCell(r, c) {
-    if(state.puzzle[r][c] !== 0) return; // Can't select fixed cells
+    if(state.puzzle[r][c] !== 0) return; 
     
     document.querySelectorAll('.cell').forEach(el => el.classList.remove('selected'));
     state.selectedCell = { r, c };
@@ -260,10 +272,9 @@ permalink: /sudoku/
     let {r, c} = state.selectedCell;
     
     state.userGrid[r][c] = num;
-    saveGame(); // Save every time the user makes a move
+    saveGame(); 
     renderBoard();
     
-    // Reselect the cell since renderBoard rebuilds the DOM
     selectCell(r, c);
     checkWin();
   }
@@ -277,7 +288,6 @@ permalink: /sudoku/
         let val = state.userGrid[r][c];
         if(val === 0 || state.puzzle[r][c] !== 0) continue; 
 
-        // Check if user input matches the solution
         if(val !== state.solution[r][c]) {
            let el = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
            if(el) el.classList.add('error');
@@ -301,13 +311,11 @@ permalink: /sudoku/
       els.winMsg.style.display = 'block';
       state.selectedCell = null;
       document.querySelectorAll('.cell').forEach(el => el.classList.remove('selected'));
-      clearSavedGame(); // Wipe the save so the next visit starts fresh
+      clearSavedGame(); 
     }
   }
 
   // --- 5. EVENT LISTENERS ---
-  
-  // Difficulty Buttons
   els.diffBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       els.diffBtns.forEach(b => b.classList.remove('active'));
@@ -318,14 +326,12 @@ permalink: /sudoku/
     });
   });
 
-  // On-Screen Numpad
   els.numBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       inputNumber(parseInt(e.target.dataset.val));
     });
   });
 
-  // Physical Keyboard Support
   document.addEventListener('keydown', (e) => {
     if(e.key >= '1' && e.key <= '9') {
       inputNumber(parseInt(e.key));
@@ -335,10 +341,8 @@ permalink: /sudoku/
   });
 
   // --- 6. INITIALIZATION ---
-  // Try to load a saved game first. If it doesn't exist, start a new easy game.
   if (!loadGame()) {
     generateBoard('easy');
   }
   renderBoard();
 </script>
-
