@@ -123,17 +123,11 @@ permalink: /share/
 </div>
 
 <script>
-  // ==========================================
-  // AUTOFILLED SUPABASE CONNECTION KEYS
-  // ==========================================
   const supabaseUrl = 'https://ygosowoqpktyitknoyxl.supabase.co'; 
   const supabaseKey = 'sb_publishable_1JvKIo-CfPgQftYLA-4-rw_45xqWbNQ'; 
   
   const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-  // ==========================================
-  // SENDER LOGIC (UPLOAD)
-  // ==========================================
   const sendBtn = document.getElementById('sendBtn');
   const fileUpload = document.getElementById('fileUpload');
   const resultBox = document.getElementById('resultBox');
@@ -143,43 +137,45 @@ permalink: /share/
     const file = fileUpload.files[0];
     if (!file) return alert("Please select a file first.");
 
-    sendBtn.innerText = "Uploading... Please wait";
+    sendBtn.innerText = "Uploading...";
     sendBtn.disabled = true;
-    resultBox.style.display = 'none';
 
-    // Generate a random 6-character code
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     const filePath = `${code}_${file.name}`;
 
     try {
-      // Step A: Upload file to the Storage Bucket
-      const { error: uploadError } = await supabase.storage
+      // DEBUG: Step A - Try to upload
+      const { data: upData, error: uploadError } = await supabase.storage
         .from('shared_files')
         .upload(filePath, file);
       
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        alert("UPLOAD ERROR: " + uploadError.message);
+        throw uploadError;
+      }
 
-      // Step B: Write the code and file path into the Database Ledger
+      // DEBUG: Step B - Try to insert into database
       const { error: dbError } = await supabase
         .from('shares')
         .insert([{ code: code, file_path: filePath }]);
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        alert("DATABASE ERROR: " + dbError.message);
+        throw dbError;
+      }
 
-      // Success UI
       displayCode.textContent = code;
       resultBox.style.display = 'block';
       fileUpload.value = '';
+      alert("Success!");
 
     } catch (error) {
-      console.error("Upload Error:", error);
-      alert("Error uploading file. Check your internet connection.");
+      console.error("Full Error Details:", error);
     } finally {
       sendBtn.innerText = "Upload & Get Code";
       sendBtn.disabled = false;
     }
   });
-
   // ==========================================
   // RECEIVER LOGIC (DOWNLOAD & DESTROY)
   // ==========================================
