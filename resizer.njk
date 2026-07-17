@@ -14,8 +14,9 @@ permalink: /resizer/
   .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-top: 1.25rem; }
   .checkbox-group label { margin: 0; cursor: pointer; }
   
-  .preview-container { margin-top: 2rem; border: 2px dashed #E2E8F0; padding: 1rem; text-align: center; border-radius: 8px; }
+  .preview-container { margin-top: 2rem; border: 2px dashed #E2E8F0; padding: 1.5rem; text-align: center; border-radius: 8px; }
   #preview { max-width: 100%; height: auto; display: none; margin-top: 1rem; border-radius: 4px; box-shadow: var(--shadow-soft); }
+  .file-size-badge { display: none; font-weight: bold; color: var(--color-economy); margin-top: 10px; font-size: 1.1rem; }
   
   .action-btn { padding: 0.75rem 1.5rem; background: var(--color-polity); color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
   .action-btn:hover { background: #2563EB; box-shadow: var(--shadow-hover); }
@@ -60,6 +61,11 @@ permalink: /resizer/
         <label for="quality">Quality (<span id="qualityVal">80</span>%)</label>
         <input type="range" id="quality" min="10" max="100" value="80" style="width: 150px;">
       </div>
+      <div>
+        <!-- NEW: Max File Size Input -->
+        <label for="maxSize">Max Size (KB) <i>(Optional)</i></label>
+        <input type="number" id="maxSize" placeholder="e.g. 50">
+      </div>
     </div>
 
     <button id="processBtn" class="action-btn" disabled>Generate & Download</button>
@@ -67,6 +73,8 @@ permalink: /resizer/
     <div class="preview-container">
       <p style="margin:0; color:var(--text-muted);">Live Preview</p>
       <img id="preview" alt="Resized preview">
+      <!-- NEW: Display the final file size so the user knows it worked -->
+      <div id="finalSize" class="file-size-badge"></div>
     </div>
   </div>
 
@@ -79,11 +87,17 @@ permalink: /resizer/
 <script>
   const state = { originalImage: new Image(), originalRatio: 1, currentFileName: '' };
   const els = {
-    upload: document.getElementById('upload'), width: document.getElementById('width'),
-    height: document.getElementById('height'), lockRatio: document.getElementById('lockRatio'),
-    format: document.getElementById('format'), quality: document.getElementById('quality'),
-    qualityVal: document.getElementById('qualityVal'), processBtn: document.getElementById('processBtn'),
-    preview: document.getElementById('preview')
+    upload: document.getElementById('upload'), 
+    width: document.getElementById('width'),
+    height: document.getElementById('height'), 
+    lockRatio: document.getElementById('lockRatio'),
+    format: document.getElementById('format'), 
+    quality: document.getElementById('quality'),
+    qualityVal: document.getElementById('qualityVal'), 
+    maxSize: document.getElementById('maxSize'),
+    processBtn: document.getElementById('processBtn'),
+    preview: document.getElementById('preview'),
+    finalSize: document.getElementById('finalSize')
   };
 
   const picaRunner = pica();
@@ -99,6 +113,7 @@ permalink: /resizer/
         els.height.value = state.originalImage.height;
         state.originalRatio = state.originalImage.width / state.originalImage.height;
         els.width.disabled = false; els.height.disabled = false; els.processBtn.disabled = false;
+        els.preview.style.display = 'none'; els.finalSize.style.display = 'none';
       };
       state.originalImage.src = event.target.result;
     };
@@ -117,30 +132,76 @@ permalink: /resizer/
 
   els.processBtn.addEventListener('click', async () => {
     if (!state.originalImage.src) return;
-    els.processBtn.textContent = 'Processing...'; els.processBtn.disabled = true;
+    els.processBtn.textContent = 'Compressing...'; els.processBtn.disabled = true;
+    els.finalSize.style.display = 'none';
 
-    const targetWidth = parseInt(els.width.value, 10), targetHeight = parseInt(els.height.value, 10);
-    const mimeType = els.format.value, qualityFloat = parseInt(els.quality.value, 10) / 100;
+    let targetWidth = parseInt(els.width.value, 10);
+    let targetHeight = parseInt(els.height.value, 10);
+    const mimeType = els.format.value;
+    let qualityFloat = parseInt(els.quality.value, 10) / 100;
+    
+    // Grab the Target Size in Bytes
+    const maxSizeInput = els.maxSize.value;
+    const targetSizeBytes = maxSizeInput ? parseInt(maxSizeInput, 10) * 1024 : null;
 
     const srcCanvas = document.createElement('canvas');
     srcCanvas.width = state.originalImage.width; srcCanvas.height = state.originalImage.height;
     srcCanvas.getContext('2d').drawImage(state.originalImage, 0, 0);
 
-    const destCanvas = document.createElement('canvas');
-    destCanvas.width = targetWidth; destCanvas.height = targetHeight;
+    let currentCanvas = document.createElement('canvas');
+    currentCanvas.width = targetWidth; currentCanvas.height = targetHeight;
 
     try {
-      await picaRunner.resize(srcCanvas, destCanvas, { unsharpAmount: 80, unsharpRadius: 0.6, unsharpThreshold: 2 });
-      const blob = await picaRunner.toBlob(destCanvas, mimeType, qualityFloat);
+      // 1. Initial Resize
+      await picaRunner.resize(srcCanvas, currentCanvas, { unsharpAmount: 80, unsharpRadius: 0.6, unsharpThreshold: 2 });
+      let blob = await picaRunner.toBlob(currentCanvas, mimeType, qualityFloat);
+
+      // 2. The Smart Loop: If it's too big, compress it further
+      if (targetSizeBytes) {
+        
+        // Step A: Drop the quality incrementally (Doesn't work well for PNG, so mainly WebP/JPEG)
+        if (mimeType !== 'image/png') {
+           while (blob.size > targetSizeBytes && qualityFloat > 0.1) {
+             qualityFloat -= 0.1;
+             blob = await picaRunner.toBlob(currentCanvas, mimeType, qualityFloat);
+           }
+        }
+
+        // Step B: If it's STILL too big, start shrinking the physical dimensions by 15% at a time
+        let safetyCounter = 0;
+        while (blob.size > targetSizeBytes && targetWidth > 100 && safetyCounter < 10) {
+           safetyCounter++;
+           targetWidth = Math.round(targetWidth * 0.85);
+           targetHeight = Math.round(targetHeight * 0.85);
+           
+           const newCanvas = document.createElement('canvas');
+           newCanvas.width = targetWidth; newCanvas.height = targetHeight;
+           
+           await picaRunner.resize(srcCanvas, newCanvas, { unsharpAmount: 80, unsharpRadius: 0.6, unsharpThreshold: 2 });
+           currentCanvas = newCanvas;
+           blob = await picaRunner.toBlob(currentCanvas, mimeType, qualityFloat);
+        }
+        
+        // Final sanity check
+        if (blob.size > targetSizeBytes) {
+            alert(`Could not compress it under ${maxSizeInput}KB without completely ruining the image. Closest achieved is ${(blob.size / 1024).toFixed(1)} KB.`);
+        }
+      }
+
+      // 3. Display and Download
       const blobUrl = URL.createObjectURL(blob);
-      
       els.preview.src = blobUrl; els.preview.style.display = 'inline-block';
+      
+      const finalKb = (blob.size / 1024).toFixed(1);
+      els.finalSize.textContent = `Final File Size: ${finalKb} KB`;
+      els.finalSize.style.display = 'block';
 
       const downloadLink = document.createElement('a');
       downloadLink.href = blobUrl;
       const baseName = state.currentFileName.substring(0, state.currentFileName.lastIndexOf('.'));
-      downloadLink.download = `${baseName}-resized.${mimeType.split('/')[1]}`;
+      downloadLink.download = `${baseName}-optimized.${mimeType.split('/')[1]}`;
       downloadLink.click();
+
     } catch (error) {
       console.error("Resizing failed:", error);
       alert("Something went wrong while processing the image.");
@@ -149,4 +210,3 @@ permalink: /resizer/
     }
   });
 </script>
-
