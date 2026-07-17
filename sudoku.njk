@@ -6,7 +6,6 @@ permalink: /sudoku/
 
 <!-- Tool-Specific Styles -->
 <style>
-  /* Base Container */
   .sudoku-ui {
     width: 100%;
     max-width: 500px;
@@ -24,7 +23,6 @@ permalink: /sudoku/
   .sudoku-header h2 { font-size: clamp(1.4rem, 5vw, 1.8rem); margin-bottom: 5px; color: var(--text-dark, #0F172A); }
   .sudoku-header p { color: var(--text-muted, #64748B); font-size: clamp(0.85rem, 3vw, 0.95rem); margin: 0; }
 
-  /* Controls */
   .diff-controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
   .diff-btn {
     background: #F1F5F9;
@@ -42,7 +40,6 @@ permalink: /sudoku/
   .diff-btn:hover { border-color: var(--color-polity, #3B82F6); color: var(--text-dark, #0F172A); }
   .diff-btn.active { background: var(--text-dark, #0F172A); color: white; border-color: var(--text-dark, #0F172A); }
 
-  /* The Grid - Fully Fluid */
   .sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
@@ -69,19 +66,16 @@ permalink: /sudoku/
     padding: 0;
   }
 
-  /* 3x3 Block Styling */
   .cell:nth-child(3n) { border-right: 2px solid var(--text-dark, #0F172A); }
   .cell:nth-child(9n) { border-right: none; }
   .cell:nth-child(n+19):nth-child(-n+27),
   .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--text-dark, #0F172A); }
 
-  /* Cell States */
   .cell.fixed { color: var(--text-dark, #0F172A); cursor: default; background: #F8FAFC; }
   .cell.user-input { color: var(--color-polity, #3B82F6); }
   .cell.selected { background: #EFF6FF !important; outline: 2px solid var(--color-polity, #3B82F6); z-index: 10; }
   .cell.error { color: var(--color-history, #EF4444); background: #FEF2F2 !important; }
 
-  /* Mobile-Optimized Numpad (2 rows of 5) */
   .numpad {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -112,7 +106,6 @@ permalink: /sudoku/
     font-size: clamp(0.9rem, 3.5vw, 1rem);
   }
 
-  /* Win Message */
   .win-overlay {
     display: none; text-align: center; margin-top: 20px;
     padding: 15px; background: #ECFDF5; border: 1px solid #10B981;
@@ -156,9 +149,6 @@ permalink: /sudoku/
   </div>
 </div>
 
-<!-- Open Source Sudoku Generator Library -->
-<script src="https://cdn.jsdelivr.net/npm/sudoku-gen@2.1.2/dist/sudoku-gen.min.js"></script>
-
 <script>
   // Game State
   const state = {
@@ -188,10 +178,13 @@ permalink: /sudoku/
     const saved = localStorage.getItem('gyanAmalaSudoku');
     if (saved) {
       const parsed = JSON.parse(saved);
-      state.puzzle = parsed.puzzle;
-      state.solution = parsed.solution;
-      state.userGrid = parsed.userGrid;
-      return true;
+      // Failsafe: only load if it has valid data (prevents loading a broken state from the library failure)
+      if (parsed.puzzle && parsed.puzzle.length === 9) {
+          state.puzzle = parsed.puzzle;
+          state.solution = parsed.solution;
+          state.userGrid = parsed.userGrid;
+          return true;
+      }
     }
     return false;
   }
@@ -200,31 +193,73 @@ permalink: /sudoku/
     localStorage.removeItem('gyanAmalaSudoku');
   }
 
-  // --- 2. SUDOKU GENERATOR (Using open-source library) ---
+  // --- 2. NATIVE SUDOKU GENERATOR ---
   function generateBoard(difficulty) {
-    let libDifficulty = 'easy';
-    if (difficulty === 'medium') libDifficulty = 'medium';
-    if (difficulty === 'hard') libDifficulty = 'hard';
-
-    const generated = window.getSudoku(libDifficulty);
-
-    const stringToArray = (str) => {
-      let grid = [];
-      for (let r = 0; r < 9; r++) {
-        let row = [];
-        for (let c = 0; c < 9; c++) {
-          let char = str[r * 9 + c];
-          row.push(char === '-' ? 0 : parseInt(char));
+    // Helper to check valid placement
+    const isValid = (board, row, col, num) => {
+        for (let i = 0; i < 9; i++) {
+            if (board[row][i] === num || board[i][col] === num) return false;
         }
-        grid.push(row);
-      }
-      return grid;
+        let startR = Math.floor(row / 3) * 3;
+        let startC = Math.floor(col / 3) * 3;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (board[startR + i][startC + j] === num) return false;
+            }
+        }
+        return true;
     };
 
-    state.puzzle = stringToArray(generated.puzzle);
-    state.solution = stringToArray(generated.solution);
-    state.userGrid = state.puzzle.map(row => [...row]);
+    const board = Array.from({ length: 9 }, () => Array(9).fill(0));
     
+    // Seed the diagonal boxes for instant variation
+    for (let i = 0; i < 9; i += 3) {
+        let nums = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
+        let idx = 0;
+        for (let r = 0; r < 3; r++) {
+            for (let c = 0; c < 3; c++) {
+                board[i + r][i + c] = nums[idx++];
+            }
+        }
+    }
+
+    // Solve remainder of the board using backtracking
+    const solve = (b) => {
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                if (b[r][c] === 0) {
+                    for (let num = 1; num <= 9; num++) {
+                        if (isValid(b, r, c, num)) {
+                            b[r][c] = num;
+                            if (solve(b)) return true;
+                            b[r][c] = 0;
+                        }
+                    }
+                    return false; 
+                }
+            }
+        }
+        return true; 
+    };
+
+    solve(board);
+    
+    // Save generated solution and create puzzle copy
+    state.solution = board.map(row => [...row]);
+    state.puzzle = board.map(row => [...row]);
+
+    // Punch holes based on difficulty
+    let blanks = difficulty === 'easy' ? 35 : (difficulty === 'medium' ? 45 : 55);
+    while (blanks > 0) {
+        let r = Math.floor(Math.random() * 9);
+        let c = Math.floor(Math.random() * 9);
+        if (state.puzzle[r][c] !== 0) {
+            state.puzzle[r][c] = 0;
+            blanks--;
+        }
+    }
+    
+    state.userGrid = state.puzzle.map(row => [...row]);
     saveGame(); 
   }
 
