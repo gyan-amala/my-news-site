@@ -27,15 +27,21 @@
                 <span></span>
             </label>
 
-            <nav class="main-nav" aria-label="Main Navigation">
+                        <nav class="main-nav" aria-label="Main Navigation">
                 <a href="/" class="nav-link {% if page.url == '/' %}active-nav{% endif %}">News Feed</a>
                 <a href="/psir/" class="nav-link {% if '/psir/' in page.url %}active-nav{% endif %}">PSIR</a>
                 <a href="/gs/" class="nav-link {% if '/gs/' in page.url %}active-nav{% endif %}">GS</a>
                 <a href="/essay/" class="nav-link {% if '/essay/' in page.url %}active-nav{% endif %}">Essay</a>
-               <a href="/resizer/" class="nav-link {% if '/resizer/' in page.url %}active-nav{% endif %}">Image Resizer</a>  
-               <a href="/sudoku/" class="nav-link {% if '/sudoku/' in page.url %}active-nav{% endif %}">Sudoku</a>
-            <a href="/share/" class="nav-link {% if '/share/' in page.url %}active-nav{% endif %}">File Drop</a>
-        </nav>
+                <a href="/resizer/" class="nav-link {% if '/resizer/' in page.url %}active-nav{% endif %}">Image Resizer</a>  
+                
+                <!-- Brain Break Games -->
+                <a href="/sudoku/" class="nav-link {% if '/sudoku/' in page.url %}active-nav{% endif %}">Sudoku</a>
+                <a href="/2048/" class="nav-link {% if '/2048/' in page.url %}active-nav{% endif %}">2048</a>
+                <a href="/minesweeper/" class="nav-link {% if '/minesweeper/' in page.url %}active-nav{% endif %}">Minesweeper</a>
+                
+                <a href="/share/" class="nav-link {% if '/share/' in page.url %}active-nav{% endif %}">File Drop</a>
+            </nav>
+
 
         </div>
     </header>
