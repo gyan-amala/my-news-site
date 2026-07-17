@@ -1,0 +1,338 @@
+---
+layout: base.html
+title: "Chess Brain Break | Gyan Amala"
+permalink: /chess/
+---
+
+<!-- Tool-Specific Styles -->
+<style>
+  .chess-ui {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    background: var(--card-bg, #ffffff);
+    padding: clamp(15px, 4vw, 30px) clamp(10px, 3vw, 20px);
+    border-radius: var(--radius, 12px);
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    box-sizing: border-box;
+    user-select: none;
+  }
+
+  .chess-header { text-align: center; margin-bottom: 20px; }
+  .chess-header h2 { font-size: clamp(1.4rem, 5vw, 1.8rem); margin-bottom: 5px; color: var(--text-dark, #0F172A); font-weight: 800; }
+  .chess-header p { color: var(--text-muted, #64748B); font-size: clamp(0.85rem, 3vw, 0.95rem); margin: 0; }
+
+  /* Controls */
+  .diff-controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+  .diff-btn {
+    background: #F1F5F9; border: 1px solid #E2E8F0; padding: 8px 16px;
+    border-radius: 50px; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; color: var(--text-muted, #64748B); transition: all 0.2s; flex: 1; max-width: 100px;
+  }
+  .diff-btn:hover { border-color: var(--text-dark, #0F172A); color: var(--text-dark, #0F172A); }
+  .diff-btn.active { background: var(--text-dark, #0F172A); color: white; border-color: var(--text-dark, #0F172A); }
+
+  .status-bar {
+    text-align: center;
+    background: #F8FAFC; padding: 10px 15px; border-radius: 8px; border: 1px solid #E2E8F0;
+    margin-bottom: 15px; font-weight: 700; font-size: 1rem; color: #334155;
+  }
+
+  /* The Grid */
+  .chess-board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 100%; max-width: min(100%, 65vh); aspect-ratio: 1;
+    margin: 0 auto;
+    border: 4px solid #334155;
+    border-radius: 4px;
+    background: #E2E8F0;
+    touch-action: manipulation; /* Prevent double-tap zoom */
+  }
+
+  .square {
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(1.8rem, 8vw, 2.5rem);
+    cursor: pointer;
+    position: relative;
+  }
+
+  /* Board Colors */
+  .square.light { background: #f0d9b5; }
+  .square.dark { background: #b58863; }
+  
+  /* Interaction States */
+  .square.selected { background: #FCD34D !important; }
+  .square.valid-move::after {
+    content: ''; position: absolute;
+    width: 25%; height: 25%;
+    background: rgba(0,0,0,0.2);
+    border-radius: 50%;
+  }
+  .square.in-check { background: #FCA5A5 !important; }
+
+  /* Piece Styling using Unicode */
+  .piece {
+    font-family: Arial, sans-serif; /* Best for rendering unicode shapes */
+    line-height: 1;
+    cursor: pointer;
+  }
+  /* White pieces are white with a black outline */
+  .piece.white { color: #ffffff; text-shadow: 0px 0px 2px #000, 0px 0px 2px #000; }
+  /* Black pieces are solid black */
+  .piece.black { color: #1e293b; }
+
+  /* Overlay */
+  .overlay {
+    display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.9);
+    flex-direction: column; align-items: center; justify-content: center; z-index: 10;
+    border-radius: 4px; text-align: center; padding: 20px;
+  }
+  .overlay h3 { font-size: 1.8rem; margin-bottom: 5px; color: var(--text-dark); }
+  .btn-restart {
+    background: var(--text-dark, #0F172A); color: white; border: none; margin-top: 15px;
+    padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer;
+  }
+</style>
+
+<div class="wrapper">
+  <div class="chess-ui">
+    
+    <div class="chess-header">
+      <h2>Chess vs AI</h2>
+      <p>Sharpen your strategy.</p>
+    </div>
+
+    <div class="diff-controls" id="diff-btns">
+      <button class="diff-btn active" data-diff="easy">Easy</button>
+      <button class="diff-btn" data-diff="medium">Medium</button>
+      <button class="diff-btn" data-diff="hard">Hard</button>
+    </div>
+
+    <div class="status-bar" id="status">
+      Your Turn (White)
+    </div>
+
+    <div style="position: relative; max-width: min(100%, 65vh); margin: 0 auto;">
+      <div id="board" class="chess-board"></div>
+      
+      <div id="overlay" class="overlay">
+        <h3 id="overlay-title">Checkmate!</h3>
+        <p id="overlay-desc">You won.</p>
+        <button class="btn-restart" onclick="initGame()">Play Again</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Highly stable, industry-standard Chess Rules Engine -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+<script>
+  let game = null;
+  let state = {
+    diff: 'easy',
+    selectedSq: null,
+    validMoves: [] // stores destination squares of selected piece
+  };
+
+  const els = {
+    board: document.getElementById('board'),
+    status: document.getElementById('status'),
+    overlay: document.getElementById('overlay'),
+    title: document.getElementById('overlay-title'),
+    desc: document.getElementById('overlay-desc'),
+    diffBtns: document.querySelectorAll('.diff-btn')
+  };
+
+  // Unicode mapping for solid shapes
+  const PIECE_SYMBOLS = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
+
+  // --- 1. INITIALIZATION ---
+  function initGame(difficulty = state.diff) {
+    game = new Chess();
+    state.diff = difficulty;
+    state.selectedSq = null;
+    state.validMoves = [];
+    
+    els.overlay.style.display = 'none';
+    els.status.innerText = "Your Turn (White)";
+    
+    createBoardDOM();
+    renderBoard();
+  }
+
+  // --- 2. UI RENDERING ---
+  function createBoardDOM() {
+    els.board.innerHTML = '';
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    
+    // Chess.js board() outputs [0][0] as a8, [7][7] as h1
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        let sq = document.createElement('div');
+        sq.classList.add('square');
+        // Checkered pattern logic
+        sq.classList.add((r + c) % 2 === 0 ? 'light' : 'dark');
+        
+        // Assign algebraic notation (e.g., 'e4')
+        let notation = files[c] + (8 - r);
+        sq.dataset.sq = notation;
+        sq.id = `sq-${notation}`;
+        
+        sq.addEventListener('click', () => handleSquareClick(notation));
+        els.board.appendChild(sq);
+      }
+    }
+  }
+
+  function renderBoard() {
+    let boardArray = game.board();
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    
+    // Clear all previous states
+    document.querySelectorAll('.square').forEach(el => {
+      el.innerHTML = '';
+      el.classList.remove('selected', 'valid-move', 'in-check');
+    });
+
+    // Draw Pieces
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        let piece = boardArray[r][c];
+        if (piece) {
+          let notation = files[c] + (8 - r);
+          let sqEl = document.getElementById(`sq-${notation}`);
+          
+          let pieceEl = document.createElement('div');
+          pieceEl.classList.add('piece', piece.color === 'w' ? 'white' : 'black');
+          pieceEl.innerText = PIECE_SYMBOLS[piece.type];
+          sqEl.appendChild(pieceEl);
+          
+          // Highlight King if in check
+          if (piece.type === 'k' && game.in_check() && game.turn() === piece.color) {
+             sqEl.classList.add('in-check');
+          }
+        }
+      }
+    }
+
+    // Draw UI Highlights
+    if (state.selectedSq) {
+      document.getElementById(`sq-${state.selectedSq}`).classList.add('selected');
+      state.validMoves.forEach(move => {
+        document.getElementById(`sq-${move.to}`).classList.add('valid-move');
+      });
+    }
+  }
+
+  // --- 3. INTERACTION LOGIC ---
+  function handleSquareClick(notation) {
+    if (game.game_over() || game.turn() === 'b') return; // Ignore if game over or computer's turn
+
+    // Case 1: Clicking a valid destination to move
+    let moveObj = state.validMoves.find(m => m.to === notation);
+    if (moveObj) {
+      // Execute Move (always auto-promote to Queen for simplicity)
+      game.move({ from: state.selectedSq, to: notation, promotion: 'q' });
+      state.selectedSq = null;
+      state.validMoves = [];
+      renderBoard();
+      
+      if (!checkGameOver()) {
+        els.status.innerText = "Computer is thinking...";
+        setTimeout(makeComputerMove, 400); // Small delay for realism
+      }
+      return;
+    }
+
+    // Case 2: Selecting a piece
+    let piece = game.get(notation);
+    if (piece && piece.color === 'w') {
+      state.selectedSq = notation;
+      state.validMoves = game.moves({ square: notation, verbose: true });
+      renderBoard();
+    } else {
+      // Clicked empty space or enemy piece without selecting first
+      state.selectedSq = null;
+      state.validMoves = [];
+      renderBoard();
+    }
+  }
+
+  // --- 4. AI BOT ---
+  function makeComputerMove() {
+    if (game.game_over()) return;
+
+    const moves = game.moves({ verbose: true });
+    let chosenMove = null;
+
+    if (state.diff === 'easy') {
+      // Easy: Completely random
+      chosenMove = moves[Math.floor(Math.random() * moves.length)];
+    } else {
+      // Medium/Hard: Greedy Bot (Hunts for highest value pieces)
+      const pieceValues = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+      let maxVal = -1;
+      
+      moves.forEach(m => {
+        if (m.captured) {
+          let val = pieceValues[m.captured];
+          if (val > maxVal) {
+            maxVal = val;
+            chosenMove = m;
+          }
+        }
+      });
+      // If no capture is possible, move randomly
+      if (!chosenMove) {
+        chosenMove = moves[Math.floor(Math.random() * moves.length)];
+      }
+    }
+
+    game.move(chosenMove.san);
+    renderBoard();
+    
+    if (!checkGameOver()) {
+      els.status.innerText = "Your Turn (White)";
+    }
+  }
+
+  // --- 5. GAME OVER CHECKS ---
+  function checkGameOver() {
+    if (game.game_over()) {
+      els.overlay.style.display = 'flex';
+      
+      if (game.in_checkmate()) {
+        let winner = game.turn() === 'w' ? 'Black (Computer)' : 'White (You)';
+        els.title.innerText = "Checkmate!";
+        els.desc.innerText = `${winner} won.`;
+        els.title.style.color = game.turn() === 'w' ? '#DC2626' : '#16A34A';
+      } else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) {
+        els.title.innerText = "Draw!";
+        els.desc.innerText = "It's a tie.";
+        els.title.style.color = '#334155';
+      }
+      els.status.innerText = "Game Over";
+      return true;
+    }
+    return false;
+  }
+
+  // --- 6. EVENT LISTENERS ---
+  els.diffBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      els.diffBtns.forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      initGame(e.target.dataset.diff);
+    });
+  });
+
+  // Start
+  initGame();
+</script>
+
