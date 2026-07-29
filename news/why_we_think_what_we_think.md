@@ -1,3 +1,13 @@
+---
+layout: article-layout.njk
+tags: news
+title: "The Architecture of the Mind: Why We Think What We Think"
+category: "history"
+trending: false
+author: "Desk Editor"
+---
+
+
 # The Architecture of the Mind: Why We Think What We Think
 
 Listen to the voice inside your head as you read this sentence. It feels incredibly intimate, entirely sovereign, and undeniably *yours*. We move through the world with the profound conviction that our thoughts are self-authored, original creations bubbling up from the depths of our unique identities. 
