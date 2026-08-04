@@ -55,7 +55,7 @@ layout: base.html
             </div>
         </main>
 
-         <!-- RIGHT: 30% SIDEBAR (NOW DYNAMIC) -->
+         <!-- RIGHT: 30% SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-widget">
                 <h3 class="widget-title">🔥 Most Read</h3>
@@ -90,36 +90,29 @@ layout: base.html
         </div>
     </section>
 
-    <!-- 4. FLUID CATEGORY GRID -->
+    <!-- 4. FLUID CATEGORY GRID (FULLY DYNAMIC) -->
     <section class="category-grid">
-        <!-- Define the categories you want Eleventy to look for and generate columns for -->
-        {% set activeCategories = ["polity", "economy", "science", "defence", "history", "geography"] %}
         
-        {% for cat in activeCategories %}
-            <!-- Check if any articles exist for this category -->
-            {% set catHasArticles = false %}
-            {% for article in collections.news %}
-                {% if article.data.category == cat %}
-                    {% set catHasArticles = true %}
-                {% endif %}
-            {% endfor %}
-
-            <!-- If articles exist, automatically generate the HTML column -->
-            {% if catHasArticles %}
+        <!-- Group all news articles by their category -->
+        {% set groupedArticles = collections.news | groupby("data.category") %}
+        
+        <!-- Loop through each discovered category and its associated articles -->
+        {% for cat, articles in groupedArticles %}
             <div class="cat-column border-{{ cat }}">
                 <h3 class="cat-header bg-{{ cat }}">{{ cat | capitalize }}</h3>
                 <div class="cat-list">
-                    {% for article in collections.news | reverse %}
-                        {% if article.data.category == cat %}
+                    
+                    <!-- Loop through the articles in this specific category -->
+                    {% for article in articles | reverse %}
                         <div class="mini-card">
                             <h4><a href="{{ article.url }}">{{ article.data.title }}</a></h4>
                         </div>
-                        {% endif %}
                     {% endfor %}
+                    
                 </div>
             </div>
-            {% endif %}
         {% endfor %}
+
     </section>
 
     <!-- 5. BOTTOM SECTION: THE THREE ARCHIVE BASKETS -->
