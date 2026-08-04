@@ -3,7 +3,7 @@ layout: article-layout.njk
 tags: news
 title: "The Social Contract of Marriage: A Political Analogy "
 excerpt: "This article explores the traditional institution of marriage through the lens of political social contract theory, drawing structural parallels between the formation of a government and the creation of a marital household. "
-category: "philosophy"
+category: "sociology"
 trending: false
 author: "Desk Editor"
 ---
