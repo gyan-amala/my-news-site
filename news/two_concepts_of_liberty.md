@@ -3,7 +3,7 @@ layout: article-layout.njk
 tags: news
 title: "Isaiah Berlin's 'Two Concepts of Liberty': The Historic Divide Between Freedom and Oppression"
 excerpt: "A comprehensive breakdown of Isaiah Berlin’s core arguments on Negative and Positive Liberty, exploring the philosophical divide, the dangers of utopianism, and the historical weaponization of freedom."
-category: "political science"
+category: "polity"
 trending: false
 author: "Desk Editor"
 ---
