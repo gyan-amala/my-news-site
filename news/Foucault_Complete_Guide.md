@@ -1,4 +1,3 @@
-
 ---
 layout: article-layout.njk
 tags: news
