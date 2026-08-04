@@ -12,7 +12,6 @@ author: "Desk Editor"
 
 
 
-# The Foucault Guide for Students: Power, Surveillance, and Society
 
 A complete, four-part series on the philosophy of Michel Foucault.
 
