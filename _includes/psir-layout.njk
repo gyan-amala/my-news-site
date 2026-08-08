@@ -57,31 +57,4 @@ layout: base.html
 
   </div>
 </div>
-
-<!-- html2pdf Library & Script -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script>
-  function downloadPDF() {
-    const element = document.getElementById('printable-psir-note');
-    const btn = document.querySelector('.editorial-pdf-btn');
-    const originalText = btn.innerHTML;
-    
-    btn.innerHTML = 'Generating... ⏳';
-    btn.style.pointerEvents = 'none';
-    btn.style.opacity = '0.7';
-    
-    const opt = {
-      margin:       [12, 15, 12, 15], 
-      filename:     '{{ title | slugify }}-psir.pdf', 
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true }, 
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).save().then(() => {
-      btn.innerHTML = originalText;
-      btn.style.pointerEvents = 'auto';
-      btn.style.opacity = '1';
-    });
-  }
-</script>
+ 
