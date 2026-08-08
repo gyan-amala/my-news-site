@@ -481,7 +481,7 @@ a { text-decoration: none; transition: all 0.2s ease; }
     padding: 50px 60px;
     
         /* Bold Rectangular Boundary */
-    border: 4px solid #1c1917;
+    border: 12px solid #1c1917;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
     
     color: #1c1917;
