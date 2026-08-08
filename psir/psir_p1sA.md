@@ -1,3 +1,17 @@
+---
+layout: "psir-layout.njk"
+title: "PSIR PAPER 1 SECTION A COMPLETE"
+paper: ""
+section: ""
+topic: ""
+subTopic: ""
+contentType: "Note"
+tags:
+   
+---
+
+
+
 # Political Science and Theory: Approaches and Evolution
 
 ## Core Concepts & Definitions
