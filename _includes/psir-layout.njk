@@ -3,13 +3,28 @@ layout: base.html
 ---
 
 <div class="editorial-page-wrapper">
-  <div class="editorial-grid">
+  
+  <div class="editorial-container-max">
     
-    <!-- 📖 LEFT COLUMN: MAIN ARTICLE (Printable Area) -->
-    <main id="printable-psir-note" class="editorial-main">
+    <!-- 🧭 TOP NAVIGATION BAR (Breadcrumbs + PDF) -->
+    <div class="editorial-top-bar">
+      <nav class="psir-breadcrumb" aria-label="Breadcrumbs">
+        <a href="/psir/">← PSIR Hub</a> / <span>Paper {{ paper }}</span> / <span>Sec {{ section }}</span>
+        {% if topic %}
+          / <span class="breadcrumb-current">{{ topic }}</span>
+        {% endif %}
+      </nav>
+
+      <button onclick="downloadPDF()" class="editorial-pdf-btn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Download PDF
+      </button>
+    </div>
+
+    <!-- 📖 MAIN DOCUMENT (The Framed Paper) -->
+    <main id="printable-psir-note" class="editorial-document">
       
       <header class="editorial-header">
-        <h1 class="editorial-title">{{ title }}</h1>
         <div class="editorial-meta-row">
           {% if contentType == "PYQ" %}
             <span class="editorial-badge">✍️ PYQ {{ year }}</span>
@@ -23,42 +38,25 @@ layout: base.html
             <span class="editorial-topic-focus">• Focus: <strong>{{ subTopic }}</strong></span>
           {% endif %}
         </div>
+        <h1 class="editorial-title">{{ title }}</h1>
       </header>
 
       <article class="editorial-content">
         {{ content | safe }}
       </article>
-      
+
     </main>
 
-    <!-- 🛠️ RIGHT COLUMN: SIDEBAR (Non-Sticky) -->
-    <aside class="editorial-sidebar">
-      
-      <!-- Breadcrumbs -->
-      <nav class="psir-breadcrumb" aria-label="Breadcrumbs">
-        <a href="/psir/">← PSIR Hub</a> / <span>Paper {{ paper }}</span> / <span>Sec {{ section }}</span>
-        {% if topic %}
-          / <span style="color: #1c1917; font-weight: bold;">{{ topic }}</span>
-        {% endif %}
-      </nav>
-
-      <!-- PDF Button -->
-      <button onclick="downloadPDF()" class="editorial-pdf-btn">
-        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-        Download PDF
-      </button>
-
-      <!-- Feedback Form -->
-      <div class="feedback-widget">
-          <h3>Have a question?</h3>
-          <p>Need clarification on this topic or spotted an error? Let us know.</p>
-          <iframe src="https://tally.so/embed/zxoBjR?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&formEventsForwarding=1" width="100%" height="250" frameborder="0" marginheight="0" marginwidth="0" title="Private Feedback"></iframe>
-      </div>
-      
-      <!-- Bottom Nav -->
-      <a href="/psir/" class="return-link">Return to PSIR Hub</a>
-      
-    </aside>
+    <!-- 💬 FOOTER / FEEDBACK WIDGET -->
+    <div class="editorial-footer-widget">
+        <h3>Have a question?</h3>
+        <p>Need clarification on this topic or spotted an error? Let us know.</p>
+        <iframe src="https://tally.so/embed/zxoBjR?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&formEventsForwarding=1" width="100%" height="250" frameborder="0" marginheight="0" marginwidth="0" title="Private Feedback"></iframe>
+        
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="/psir/" class="return-link">Return to PSIR Hub</a>
+        </div>
+    </div>
 
   </div>
 </div>
@@ -75,7 +73,6 @@ layout: base.html
     btn.style.pointerEvents = 'none';
     btn.style.opacity = '0.7';
     
-    // Using the precise margins from your Python script
     const opt = {
       margin:       [12, 15, 12, 15], 
       filename:     '{{ title | slugify }}-psir.pdf', 
