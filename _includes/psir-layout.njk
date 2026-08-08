@@ -2,73 +2,99 @@
 layout: base.html
 ---
 
-<div class="psir-article-container">
+<div class="psir-dashboard-wrapper">
   
   <!-- 🗺️ BREADCRUMB NAVIGATION -->
-  <nav class="psir-breadcrumb" aria-label="Breadcrumbs">
-    <a href="/psir/" class="breadcrumb-link">← PSIR Hub</a>
-    <span class="breadcrumb-divider">/</span>
-    <span>Paper {{ paper }}</span>
-    <span class="breadcrumb-divider">/</span>
-    <span>Section {{ section }}</span>
+  <nav class="psir-breadcrumb" aria-label="Breadcrumbs" style="margin-bottom: 20px;">
+    <a href="/psir/" class="breadcrumb-link" style="color: var(--text-muted); font-weight: 600;">← PSIR Hub</a>
+    <span class="breadcrumb-divider" style="margin: 0 10px;">/</span>
+    <span style="color: var(--text-muted);">Paper {{ paper }}</span>
+    <span class="breadcrumb-divider" style="margin: 0 10px;">/</span>
+    <span style="color: var(--text-muted);">Section {{ section }}</span>
     {% if topic %}
-      <span class="breadcrumb-divider">/</span>
-      <span class="breadcrumb-current">{{ topic }}</span>
+      <span class="breadcrumb-divider" style="margin: 0 10px;">/</span>
+      <span class="breadcrumb-current" style="color: var(--text-dark); font-weight: 700;">{{ topic }}</span>
     {% endif %}
   </nav>
 
-  <!-- 📝 ARTICLE HEADER -->
-  <header class="psir-article-header">
-    <div class="psir-badge-row">
-      
-      <!-- Dynamic Content Type Badge -->
-      {% if contentType == "PYQ" %}
-        <span class="badge badge-pyq">
-          ✍️ PYQ {{ year }}
-        </span>
-      {% elif contentType == "ModelAnswer" %}
-        <span class="badge badge-model">
-          💡 Model Answer
-        </span>
-      {% else %}
-        <span class="badge badge-note">
-          📝 Core Note
-        </span>
-      {% endif %}
+  <!-- PDF DOWNLOAD BUTTON (Top Right) -->
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+    <button onclick="downloadPDF()" class="editorial-pdf-btn">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+      Download PDF
+    </button>
+  </div>
 
-      {% if subTopic %}
-        <span class="psir-topic-focus">• Topic Focus: <strong>{{ subTopic }}</strong></span>
-      {% endif %}
-    </div>
+  <!-- 🖨️ START OF PRINTABLE EDITORIAL AREA -->
+  <div id="printable-psir-note" class="editorial-container">
+    
+    <!-- 📝 ARTICLE HEADER -->
+    <header class="editorial-header">
+      <div class="editorial-badge-row">
+        {% if contentType == "PYQ" %}
+          <span class="editorial-badge">✍️ PYQ {{ year }}</span>
+        {% elif contentType == "ModelAnswer" %}
+          <span class="editorial-badge">💡 MODEL ANSWER</span>
+        {% else %}
+          <span class="editorial-badge">📝 CORE NOTE</span>
+        {% endif %}
 
-    <!-- Note Title -->
-    <h1 class="psir-title">
-      {{ title }}
-    </h1>
-  </header>
+        {% if subTopic %}
+          <span class="editorial-topic-focus">• Topic Focus: <strong>{{ subTopic }}</strong></span>
+        {% endif %}
+      </div>
 
-  <!-- 📖 NOTE BODY CONTENT -->
-  <article class="psir-content">
-    {{ content | safe }}
-  </article>
-  
+      <h1 class="editorial-title">{{ title }}</h1>
+    </header>
 
+    <!-- 📖 NOTE BODY CONTENT -->
+    <article class="editorial-content">
+      {{ content | safe }}
+    </article>
+    
+  </div>
+  <!-- 🖨️ END OF PRINTABLE AREA -->
+
+  <!-- 💬 FEEDBACK FORM -->
   <div style="margin-top: 60px; padding-top: 30px; border-top: 1px solid #E2E8F0;">
       <h3 style="margin-bottom: 10px; color: var(--text-dark);">Have a question?</h3>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">
           Need clarification on this topic or spotted an error in the notes? Let us know below.
       </p>
-      
       <iframe src="https://tally.so/embed/zxoBjR?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&formEventsForwarding=1" width="100%" height="250" frameborder="0" marginheight="0" marginwidth="0" title="Private Feedback"></iframe>
   </div>
 
-  
-
   <!-- 🔙 BOTTOM NAVIGATION BAR -->
-  <div class="psir-footer-nav">
-    <a href="/psir/" class="return-btn">
-      Return to PSIR Study Hub
-    </a>
+  <div class="psir-footer-nav" style="margin-top: 40px; text-align: center;">
+    <a href="/psir/" class="filter-btn">Return to PSIR Study Hub</a>
   </div>
 
 </div>
+
+<!-- html2pdf Library and Custom Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  function downloadPDF() {
+    const element = document.getElementById('printable-psir-note');
+    const btn = document.querySelector('.editorial-pdf-btn');
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = 'Generating... ⏳';
+    btn.style.pointerEvents = 'none';
+    btn.style.opacity = '0.7';
+    
+    const opt = {
+      margin:       [12, 15, 12, 15], 
+      filename:     '{{ title | slugify }}-psir.pdf', 
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true }, 
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      btn.innerHTML = originalText;
+      btn.style.pointerEvents = 'auto';
+      btn.style.opacity = '1';
+    });
+  }
+</script>
